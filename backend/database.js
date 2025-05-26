@@ -13,12 +13,12 @@ const sequelize = new Sequelize({
 // Synchronize all models
 // { alter: true } will attempt to update the table to match the model without dropping it
 // { force: true } would drop the table if it already exists - use with caution
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('Database synchronized successfully.');
-  })
-  .catch(err => {
-    console.error('Error synchronizing database:', err);
-  });
+// sequelize.sync({ alter: true })
+//   .then(() => {
+//     console.log('Database synchronized successfully.');
+//   })
+//   .catch(err => {
+//     console.error('Error synchronizing database:', err);
+//   });
 
 module.exports = sequelize;

@@ -6,7 +6,8 @@ import LoginForm from './components/LoginForm'; // Import LoginForm
 import RegisterForm from './components/RegisterForm'; // Import RegisterForm
 import BusinessMap from './components/BusinessMap'; // Import BusinessMap
 import BusinessMenu from './components/BusinessMenu'; // Import BusinessMenu
-
+// Esempio in main.tsx o App.tsx
+import 'leaflet/dist/leaflet.css';
 // Define Business interface based on BusinessMap.tsx and BusinessMenu.tsx
 // Using 'id: number' as per BusinessMap.tsx which is the data source
 interface Business {

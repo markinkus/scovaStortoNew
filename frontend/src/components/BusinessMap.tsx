@@ -96,7 +96,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({ onBusinessesLoaded, selectedB
   }
 
   return (
-    <Box sx={{ height: 'calc(100vh - 120px)', width: '100%', position: 'relative' }}> {/* Adjust height as needed */}
+    <Box sx={{ height: '100%', width: '100%', position: 'relative' }}> {/* Adjust height as needed */}
       {token && (
         <Button
           variant="contained"
@@ -110,7 +110,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({ onBusinessesLoaded, selectedB
       <MapContainer
         center={defaultPosition}
         zoom={businesses.length > 0 ? 6 : 2}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', zIndex: 9999 }}
         whenCreated={instance => { mapRef.current = instance; }} // Assign map instance
       >
         <TileLayer

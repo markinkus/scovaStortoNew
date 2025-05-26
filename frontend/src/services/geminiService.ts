@@ -1,15 +1,15 @@
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import { ParsedReceiptInfo } from "../types";
-import { GEMINI_MODEL_TEXT } from "../constants";
+// import { ParsedReceiptInfo } from "../types";
+// import { GEMINI_MODEL_TEXT } from "../constants";
 
 // Variabile per conservare l'istanza dell'AI e lo stato della chiave API
 let ai: GoogleGenAI | null = null;
 let apiKeyIsAvailable = false;
-
+let GEMINI_API_KEY = "AIzaSyCUspjopyRDqf8iR-ftL7UsPyaYfAt1p_M";
 try {
-  if (process.env.API_KEY) {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (GEMINI_API_KEY) {
+    ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     apiKeyIsAvailable = true;
   } else {
     console.warn("Chiave API Gemini non trovata in process.env.API_KEY. Le funzionalità OCR saranno limitate.");

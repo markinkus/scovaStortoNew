@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { extractTextWithGemini } from '../../services/geminiService';
+import { extractTextWithGemini } from '../services/geminiService';
 import { ParsedReceiptInfo, Business } from '../../../types'; // Adjusted path for Business
-import { get, post } from '../../../services/api'; // Import get and post services
+import { get, post } from '../services/api'; // Import get and post services
 import {
   Button,
   TextField,

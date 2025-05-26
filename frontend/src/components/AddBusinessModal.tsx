@@ -84,15 +84,15 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
     // Latitude and Longitude validation (still good to check if they are provided)
     // The backend will handle parseFloat for these string values.
     if (!formData.latitude || !formData.longitude) {
-        setError('Latitude and Longitude are required.');
-        return;
+      setError('Latitude and Longitude are required.');
+      return;
     }
     // Basic check if they look like numbers can still be useful, but not strictly required
     // if the backend does robust parsing. For now, we'll rely on backend validation for format.
 
     if (!token) {
-        setError('You must be logged in to add a business.');
-        return;
+      setError('You must be logged in to add a business.');
+      return;
     }
 
     setSubmitting(true);
@@ -293,7 +293,6 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
               </Typography>
             )}
           </Box>
-        </Box>
       </DialogContent>
       <DialogActions sx={{p: '16px 24px', pt:0}}>
         <Button onClick={handleClose} color="secondary" disabled={submitting || geocodingInProgress}>
@@ -303,7 +302,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
           {submitting ? <CircularProgress size={24} /> : 'Add Business'}
         </Button>
       </DialogActions>
-    </Dialog>
+    </Dialog >
   );
 };
 

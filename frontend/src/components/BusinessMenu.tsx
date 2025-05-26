@@ -58,7 +58,7 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({ businesses, onSelectBusines
         {filteredBusinesses.length > 0 ? (
           filteredBusinesses.map((business) => (
             <ListItem
-              button
+              // button
               key={business.id}
               onClick={() => onSelectBusiness(business)}
               sx={{
