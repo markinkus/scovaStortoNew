@@ -560,7 +560,15 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({ open, onClose, busi
           onClick={handleSubmit} 
           variant="contained" 
           color="primary" 
-          disabled={submitting || ocrInProgress || validationStatus !== 'success'}
+          disabled={
+            submitting || 
+            ocrInProgress || 
+            !businessId || 
+            !description.trim() || 
+            !receiptFile || 
+            validationStatus === 'pending' || 
+            validationStatus === 'idle'
+          }
         >
           {submitting ? <CircularProgress size={24} color="inherit" /> : 'Invia Segnalazione'}
         </Button>

@@ -115,9 +115,17 @@ router.post('/', authMiddleware, anomalyUpload.fields([
     res.status(201).json(anomalyWithDetails);
 
   } catch (error) {
-    console.error('Error reporting anomaly:', error);
+    console.error('Error reporting anomaly:', { message: error.message, name: error.name, stack: error.stack, details: error });
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({ message: 'Validation error', errors: error.errors.map(e => e.message) });
+    } else if (error.name && error.name.startsWith('Sequelize')) {
+      // Handle other Sequelize-specific errors
+      const status = error.name === 'SequelizeUniqueConstraintError' ? 409 : 400;
+      return res.status(status).json({
+        message: 'Database error: ' + error.message,
+        type: error.name,
+        errors: error.errors ? error.errors.map(e => e.message) : []
+      });
     }
     res.status(500).json({ message: 'Server error while reporting anomaly.' });
   }
