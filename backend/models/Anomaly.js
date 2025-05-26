@@ -8,12 +8,36 @@ const Anomaly = sequelize.define('Anomaly', {
     primaryKey: true
   },
   description: {
-    type: DataTypes.TEXT, // TEXT for potentially longer descriptions
+    type: DataTypes.TEXT,
     allowNull: false
   },
-  photo_url: {
+  receipt_photo_url: {
     type: DataTypes.STRING,
-    allowNull: true // Optional
+    allowNull: false
+  },
+  anomaly_photo_urls: {
+    type: DataTypes.JSON, // Store as JSON array of strings
+    allowNull: true
+  },
+  ocr_business_name: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ocr_p_iva: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ocr_address: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ocr_date: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ocr_total_amount: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   timestamps: true

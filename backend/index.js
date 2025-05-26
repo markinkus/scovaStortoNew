@@ -1,5 +1,6 @@
 // backend/index.js
 const express = require('express');
+const path = require('path'); // Import path module
 const sequelize = require('./database'); // Importa l'istanza da backend/database.js
 const authRoutes = require('./routes/auth');
 const businessRoutes = require('./routes/businessRoutes');
@@ -41,6 +42,9 @@ sequelize.authenticate()
 app.use('/api/auth', authRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use('/api/anomalies', anomalyRoutes);
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Il backend è in esecuzione!' });

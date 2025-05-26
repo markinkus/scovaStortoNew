@@ -22,6 +22,14 @@ const Business = sequelize.define('Business', {
   longitude: {
     type: DataTypes.FLOAT,
     allowNull: false
+  },
+  p_iva: {
+    type: DataTypes.STRING,
+    allowNull: true // Optional VAT number
+  },
+  photo_url: {
+    type: DataTypes.STRING,
+    allowNull: true // Optional URL or path to the shop photo
   }
 }, {
   timestamps: true

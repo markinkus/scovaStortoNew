@@ -1,30 +1,77 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer'); // For handling file uploads
+const path = require('path'); // For manipulating file paths
+const fs = require('fs'); // For file system operations, like creating directories
 const User = require('../models/User');
 const Business = require('../models/Business');
 const Anomaly = require('../models/Anomaly');
 const authMiddleware = require('../middleware/authMiddleware');
 const { Sequelize } = require('sequelize'); // Import Sequelize
 
+// Configure multer for file uploads
+const uploadDir = path.join(__dirname, '..', 'uploads', 'shop_photos');
+
+// Ensure the upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Use a timestamp and the original extension to create a unique filename
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+  fileFilter: function (req, file, cb) {
+    // Allow only image files
+    const filetypes = /jpeg|jpg|png|gif/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('Error: File upload only supports the following filetypes - ' + filetypes));
+  }
+});
+
 // POST /api/businesses - Create a new business
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, upload.single('shopPhoto'), async (req, res) => {
   try {
-    const { name, address, latitude, longitude } = req.body;
+    const { name, address, latitude, longitude, p_iva } = req.body; // Include p_iva
 
     // Validate input
     if (!name || !address || !latitude || !longitude) {
       return res.status(400).json({ message: 'Name, address, latitude, and longitude are required.' });
     }
-    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-        return res.status(400).json({ message: 'Latitude and longitude must be numbers.' });
+    // Latitude and longitude are sent as strings from FormData, convert and validate
+    const lat = parseFloat(latitude);
+    const lon = parseFloat(longitude);
+
+    if (isNaN(lat) || typeof lat !== 'number' || isNaN(lon) || typeof lon !== 'number') {
+      return res.status(400).json({ message: 'Latitude and longitude must be valid numbers.' });
     }
 
+    let photo_url = null;
+    if (req.file) {
+      // Construct the URL path for the photo. Assumes 'uploads' is served statically.
+      photo_url = `/uploads/shop_photos/${req.file.filename}`;
+    }
 
     const newBusiness = await Business.create({
       name,
       address,
-      latitude,
-      longitude,
+      latitude: lat, // Use parsed latitude
+      longitude: lon, // Use parsed longitude
+      p_iva, // Add p_iva
+      photo_url, // Add photo_url
       addedBy: req.user.id // From authMiddleware
     });
 

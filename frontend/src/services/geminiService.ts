@@ -49,6 +49,8 @@ export const extractTextWithGemini = async (
       text: `Analizza l'immagine di questo scontrino fiscale italiano. Estrai le seguenti informazioni e restituiscile ESCLUSIVAMENTE in formato JSON, seguendo questa struttura:
 {
   "nome_esercizio": "string | null",
+  "p_iva": "string | null",
+  "indirizzo_esercizio": "string | null",
   "data": "string | null (formato DD/MM/YYYY o YYYY-MM-DD)",
   "articoli": ["string"],
   "importo_totale": "string | null (con valuta, es. '12.34 EUR')",
