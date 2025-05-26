@@ -7,10 +7,10 @@ beforeAll(async () => {
   // If your database.js already connects to a specific file,
   // ensure this file is gitignored or is a dedicated test DB.
   // For true in-memory, you might reconfigure sequelize here:
-  // await sequelize.close(); // Close existing connection if any
-  // await sequelize.dialect.connectionManager._clearTypeParser(); // Needed for re-init
-  // sequelize.options.storage = ':memory:'; // Force in-memory
-  // await sequelize.authenticate(); // Re-authenticate with in-memory
+  await sequelize.close(); // Close existing connection if any
+  await sequelize.dialect.connectionManager._clearTypeParser(); // Needed for re-init
+  sequelize.options.storage = ':memory:'; // Force in-memory
+  await sequelize.authenticate(); // Re-authenticate with in-memory
 
   // Sync all models. { force: true } will drop tables first.
   await sequelize.sync({ force: true });

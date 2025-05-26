@@ -1,28 +1,14 @@
 const { Sequelize } = require('sequelize');
+const path = require('path'); // Utile per gestire i path
 
-// Initialize Sequelize with SQLite
+// Crea l'istanza di Sequelize
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite', // Path to your SQLite database file
-  logging: false // Disable logging for cleaner output, can be enabled for debugging
+  // Il file database.sqlite sarà creato nella directory 'backend'
+  storage: path.join(__dirname, 'database.sqlite'),
+  logging: console.log, // Puoi impostarlo a 'false' per meno output in console
+                         // o lasciare console.log per vedere le query SQL durante lo sviluppo
 });
-
-// Import models
-const User = require('./models/User');
-const Business = require('./models/Business');
-const Anomaly = require('./models/Anomaly');
-
-// Store models in an object to pass to associate functions
-const models = {
-  User,
-  Business,
-  Anomaly
-};
-
-// Call associate methods if they exist
-Object.values(models)
-  .filter(model => typeof model.associate === 'function')
-  .forEach(model => model.associate(models));
 
 // Synchronize all models
 // { alter: true } will attempt to update the table to match the model without dropping it
