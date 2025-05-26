@@ -13,7 +13,8 @@ import {
   DialogTitle,
   Alert,
   CircularProgress,
-  Box
+  Box,
+  Typography,
 } from '@mui/material';
 
 interface AnomalyFormModalProps {

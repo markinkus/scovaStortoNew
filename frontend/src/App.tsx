@@ -1,52 +1,36 @@
-import React, { useState } from 'react'; // Import useState
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, Box, Grid } from '@mui/material'; // Import Grid
-import { useAuth } from './contexts/AuthContext'; // Import useAuth
-import LoginForm from './components/LoginForm'; // Import LoginForm
-import RegisterForm from './components/RegisterForm'; // Import RegisterForm
-import BusinessMap from './components/BusinessMap'; // Import BusinessMap
-import BusinessMenu from './components/BusinessMenu'; // Import BusinessMenu
-// Esempio in main.tsx o App.tsx
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import { useAuth } from './contexts/AuthContext';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
+import BusinessMap from './components/BusinessMap';
+import BusinessMenu from './components/BusinessMenu';
 import 'leaflet/dist/leaflet.css';
-// Define Business interface based on BusinessMap.tsx and BusinessMenu.tsx
-// Using 'id: number' as per BusinessMap.tsx which is the data source
-interface Business {
-  id: number; // Changed from string to number to align with BusinessMap
-  name: string;
-  address: string;
-  latitude?: number; // Optional, as in BusinessMenu
-  longitude?: number; // Optional, as in BusinessMenu
-  type?: string; // Optional, as in BusinessMenu
-  // addedByUser and anomalyCount are specific to BusinessMap's internal state,
-  // but might be useful if passed through. For now, keeping it minimal.
-}
 
+interface Business { /* ... */ }
 
 function App() {
-  const { token, user, logout, isLoading } = useAuth(); // Use auth state
+  const { token, user, logout, isLoading } = useAuth();
   const [businessesForMenu, setBusinessesForMenu] = useState<Business[]>([]);
-  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null); // State for selected business
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
 
-  const handleSelectBusiness = (business: Business) => {
-    console.log('Selected business in App:', business);
-    setSelectedBusiness(business); // Update selected business state
-  };
-
-  if (isLoading) {
-    return <Typography>Loading...</Typography>; // Or a proper spinner
-  }
+  if (isLoading) return <Typography>Loading...</Typography>;
 
   return (
     <Router>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <AppBar position="static" sx={{ height: '64px' }}> {/* Single AppBar */}
+        <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                Anomaly Reporter
-              </Link>
+            <Typography
+              variant="h6"
+              component={Link}
+              to="/"
+              sx={{ color: 'inherit', textDecoration: 'none', flexGrow: 1 }}
+            >
+              Anomaly Reporter
             </Typography>
-            {token && user ? (
+            {token ? (
               <>
                 <Typography sx={{ mr: 2 }}>Hi, {user.username}</Typography>
                 <Button color="inherit" onClick={logout}>Logout</Button>
@@ -59,45 +43,38 @@ function App() {
             )}
           </Toolbar>
         </AppBar>
+
+        {/* Contenitore principale */}
+        <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+          {/* Menu */}
+          <Box sx={{
+            width: { xs: '100%', sm: '30%', md: '25%' },
+            overflowY: 'auto',
+            borderRight: '1px solid',
+            borderColor: 'divider',
+          }}>
+            <BusinessMenu
+              businesses={businessesForMenu}
+              onSelectBusiness={setSelectedBusiness}
+            />
+          </Box>
+
+          {/* Mappa */}
+          <Box sx={{ flexGrow: 1, height: '100%' }}>
+            <BusinessMap
+              onBusinessesLoaded={setBusinessesForMenu}
+              selectedBusiness={selectedBusiness}
+            />
+          </Box>
+        </Box>
+
+        {/* Rotte Login/Register */}
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Grid container sx={{ flexGrow: 1, height: 'calc(100vh - 64px)' }}> {/* Grid takes remaining height */}
-                <Grid item xs={12} sm={4} md={3} sx={{ height: '100%', overflowY: 'auto', borderRight: { sm: '1px solid #ddd'} }}>
-                  <Box sx={{ p: { xs: 1, sm: 2 } , height: '100%'}}>
-                    <BusinessMenu
-                      businesses={businessesForMenu}
-                      onSelectBusiness={handleSelectBusiness}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={8} md={9} sx={{ height: '100%' }}>
-                  <Box sx={{ height: '100%' }}> {/* Ensure Box takes full height of Grid item */}
-                    <BusinessMap
-                      onBusinessesLoaded={setBusinessesForMenu}
-                      selectedBusiness={selectedBusiness} // Pass selectedBusiness to BusinessMap
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-            }
-          />
-          <Route path="/login" element={
-            <Container sx={{pt: 2}}>
-              <LoginForm />
-            </Container>
-          } />
-          <Route path="/register" element={
-            <Container sx={{pt: 2}}>
-              <RegisterForm />
-            </Container>
-          } />
-          {/* Add other routes here */}
+          <Route path="/login" element={<Container sx={{ pt: 2 }}><LoginForm/></Container>} />
+          <Route path="/register" element={<Container sx={{ pt: 2 }}><RegisterForm/></Container>} />
         </Routes>
       </Box>
     </Router>
   );
 }
-
 export default App;

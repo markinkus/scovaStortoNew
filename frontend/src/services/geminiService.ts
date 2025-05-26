@@ -1,7 +1,7 @@
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-// import { ParsedReceiptInfo } from "../types";
-// import { GEMINI_MODEL_TEXT } from "../constants";
+import { ParsedReceiptInfo } from "../../types";
+import { GEMINI_MODEL_TEXT } from "../../constants";
 
 // Variabile per conservare l'istanza dell'AI e lo stato della chiave API
 let ai: GoogleGenAI | null = null;

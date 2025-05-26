@@ -110,7 +110,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({ onBusinessesLoaded, selectedB
       <MapContainer
         center={defaultPosition}
         zoom={businesses.length > 0 ? 6 : 2}
-        style={{ height: '100%', width: '100%', zIndex: 9999 }}
+        style={{ height: '100%', width: '100%', backgroundColor: '#f0e5d8', minHeight: '150px', minWidth: '150px' }}
         whenCreated={instance => { mapRef.current = instance; }} // Assign map instance
       >
         <TileLayer
