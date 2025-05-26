@@ -26,7 +26,9 @@ export interface Anomaly {
 // Per il testo OCR strutturato da Gemini
 export interface ParsedReceiptInfo {
   nome_esercizio?: string;
-  data?: string;
+  p_iva?: string;          // Aggiunto
+  indirizzo_esercizio?: string; // Aggiunto
+  data?: string;           // Può essere usato per la data dello scontrino
   articoli?: string[];
   importo_totale?: string;
   altro?: string;

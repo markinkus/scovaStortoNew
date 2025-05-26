@@ -1,43 +1,99 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
 const Business = require('../models/Business');
 const Anomaly = require('../models/Anomaly');
 const authMiddleware = require('../middleware/authMiddleware');
 const { Sequelize } = require('sequelize'); // For potential use in complex queries
 
+// Configure multer for anomaly file uploads
+const anomalyUploadDir = path.join(__dirname, '..', 'uploads', 'anomaly_files');
+
+if (!fs.existsSync(anomalyUploadDir)) {
+  fs.mkdirSync(anomalyUploadDir, { recursive: true });
+}
+
+const anomalyStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, anomalyUploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname.replace(/\s/g, '_'));
+  }
+});
+
+const anomalyUpload = multer({
+  storage: anomalyStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Sono permesse solo immagini!'), false);
+    }
+  }
+});
+
 // POST /api/anomalies - Report a new anomaly
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, anomalyUpload.fields([
+  { name: 'receiptPhoto', maxCount: 1 },
+  { name: 'anomalyPhotos', maxCount: 5 }
+]), async (req, res) => {
   try {
-    const { description, businessId, photo_url } = req.body;
+    const {
+      description,
+      businessId,
+      ocr_business_name,
+      ocr_p_iva,
+      ocr_address,
+      ocr_date,
+      ocr_total_amount
+    } = req.body;
 
     // 1. Validate input
     if (!description || !businessId) {
       return res.status(400).json({ message: 'Description and businessId are required.' });
     }
     if (description.trim() === '') {
-        return res.status(400).json({ message: 'Description cannot be empty.' });
+      return res.status(400).json({ message: 'Description cannot be empty.' });
     }
-    if (typeof businessId !== 'number') {
-        return res.status(400).json({ message: 'businessId must be a number.' });
-    }
-    if (photo_url && typeof photo_url !== 'string') { // Optional: validate photo_url format if needed
-        return res.status(400).json({ message: 'photo_url must be a string.' });
+    // businessId is string from FormData, convert and validate
+    const parsedBusinessId = parseInt(businessId, 10);
+    if (isNaN(parsedBusinessId)) {
+        return res.status(400).json({ message: 'businessId must be a valid number.' });
     }
 
+    if (!req.files || !req.files.receiptPhoto || !req.files.receiptPhoto[0]) {
+      return res.status(400).json({ message: 'Receipt photo is required.' });
+    }
 
     // 2. Verify that the Business exists
-    const business = await Business.findByPk(businessId);
+    const business = await Business.findByPk(parsedBusinessId);
     if (!business) {
       return res.status(404).json({ message: 'Business not found with the provided businessId.' });
+    }
+
+    const receipt_photo_url = `/uploads/anomaly_files/${req.files.receiptPhoto[0].filename}`;
+    let anomaly_photo_urls = null;
+    if (req.files.anomalyPhotos && req.files.anomalyPhotos.length > 0) {
+      anomaly_photo_urls = req.files.anomalyPhotos.map(file => `/uploads/anomaly_files/${file.filename}`);
     }
 
     // 3. Create new anomaly
     const newAnomaly = await Anomaly.create({
       description,
-      businessId,
-      photo_url, // Can be null
-      reportedBy: req.user.id // From authMiddleware
+      businessId: parsedBusinessId,
+      reportedBy: req.user.id,
+      receipt_photo_url,
+      anomaly_photo_urls,
+      ocr_business_name,
+      ocr_p_iva,
+      ocr_address,
+      ocr_date,
+      ocr_total_amount
     });
 
     // 4. Fetch and return the created anomaly with associations
