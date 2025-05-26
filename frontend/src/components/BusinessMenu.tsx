@@ -42,7 +42,7 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({ businesses, onSelectBusines
   });
 
   return (
-    <Paper elevation={3} sx={{ padding: 2, maxHeight: '100vh', overflowY: 'auto' }}>
+    <Paper elevation={3} sx={{ padding: 2, height: '100%', overflowY: 'auto' }}>
       <Typography variant="h6" gutterBottom>
         Businesses
       </Typography>

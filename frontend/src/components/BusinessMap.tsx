@@ -43,8 +43,8 @@ const BusinessMap: React.FC<BusinessMapProps> = ({ onBusinessesLoaded, selectedB
       setBusinesses(data);
       onBusinessesLoaded(data); // Call the callback with the loaded businesses
     } catch (err: any) {
+      console.error('Failed to fetch businesses. Full error:', err, 'Response data:', err.response?.data);
       setError('Failed to fetch businesses. Please try again later.');
-      console.error('Fetch businesses error:', err);
     } finally {
       setLoading(false);
     }
