@@ -1,0 +1,8 @@
+{
+  "name": "ScovaStorto",
+  "description": "Piattaforma per segnalare e visualizzare anomalie in attività commerciali come ristoranti, alberghi, ecc., verificando le segnalazioni tramite scontrini e immagini. Non lasciare che ti servano anomalie!",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": ""
+}
