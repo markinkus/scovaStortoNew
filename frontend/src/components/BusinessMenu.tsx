@@ -1,86 +1,91 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import {
-  Box,
-  TextField,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  Typography,
+  Paper, Typography, TextField, FormControl, InputLabel,
+  Select, MenuItem, List, ListItemButton, ListItemText
 } from '@mui/material';
+import { Business } from '../App';
 
-// Define the Business interface
-interface Business {
-  id: number; // Standardized to number
-  name: string;
-  address: string;
-  // Add other properties if needed from your types.ts or API response
-  latitude?: number;
-  longitude?: number;
-  type?: string;
-}
-
-// Define the props for the BusinessMenu component
 interface BusinessMenuProps {
   businesses: Business[];
+  selectedBusiness: Business | null;
   onSelectBusiness: (business: Business) => void;
 }
 
-const BusinessMenu: React.FC<BusinessMenuProps> = ({ businesses, onSelectBusiness }) => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
+const BusinessMenu: React.FC<BusinessMenuProps> = ({
+  businesses, selectedBusiness, onSelectBusiness
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const itemRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
-  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
+  // Estrai tipi unici
+  const types = Array.from(
+    new Set(businesses.map(b => b.type).filter(Boolean) as string[])
+  );
 
-  const filteredBusinesses = businesses.filter((business) => {
-    const searchTermLower = searchTerm.toLowerCase();
-    return (
-      business.name.toLowerCase().includes(searchTermLower) ||
-      business.address.toLowerCase().includes(searchTermLower)
-    );
-  });
+  // Filtra
+  const filtered = businesses
+    .filter(b => filterType === 'all' || b.type === filterType)
+    .filter(b => {
+      const term = searchTerm.toLowerCase();
+      return (
+        b.name.toLowerCase().includes(term) ||
+        b.address.toLowerCase().includes(term)
+      );
+    });
+
+  // Scroll all’item selezionato
+  useEffect(() => {
+    if (selectedBusiness) {
+      const el = itemRefs.current[selectedBusiness.id];
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [selectedBusiness]);
 
   return (
-    <Paper elevation={3} sx={{ padding: 2, height: '100%', overflowY: 'auto' }}>
-      <Typography variant="h6" gutterBottom>
-        Businesses
-      </Typography>
+    <Paper elevation={1} sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
+      <Typography variant="h6" gutterBottom>Businesses</Typography>
+
       <TextField
-        fullWidth
-        label="Search Businesses"
-        variant="outlined"
+        fullWidth size="small" label="Search"
         value={searchTerm}
-        onChange={handleSearchChange}
-        sx={{ marginBottom: 2 }}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+        sx={{ mb: 2 }}
       />
-      <List>
-        {filteredBusinesses.length > 0 ? (
-          filteredBusinesses.map((business) => (
-            <ListItem
-              // button
-              key={business.id}
-              onClick={() => onSelectBusiness(business)}
-              sx={{
-                borderBottom: '1px solid #eee',
-                '&:last-child': {
-                  borderBottom: 'none',
-                },
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                },
-              }}
-            >
-              <ListItemText
-                primary={business.name}
-                secondary={business.address}
-              />
-            </ListItem>
-          ))
-        ) : (
-          <ListItem>
-            <ListItemText primary="No businesses found." />
-          </ListItem>
+
+      <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+        <InputLabel>Type</InputLabel>
+        <Select
+          value={filterType}
+          label="Type"
+          onChange={(e) => setFilterType(e.target.value as string)}
+        >
+          <MenuItem value="all">All</MenuItem>
+          {types.map(t => (
+            <MenuItem key={t} value={t}>{t}</MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <List disablePadding>
+        {filtered.length > 0 ? filtered.map(b => (
+          <ListItemButton
+            key={b.id}
+            selected={selectedBusiness?.id === b.id}
+            onClick={() => onSelectBusiness(b)}
+            ref={el => (itemRefs.current[b.id] = el)}
+            sx={{
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              '&:hover': { backgroundColor: 'action.hover' }
+            }}
+          >
+            <ListItemText primary={b.name} secondary={b.address}/>
+          </ListItemButton>
+        )) : (
+          <ListItemButton disabled>
+            <ListItemText primary="No businesses found."/>
+          </ListItemButton>
         )}
       </List>
     </Paper>

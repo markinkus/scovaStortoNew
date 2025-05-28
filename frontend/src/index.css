@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* Rimuove sfondo e bordo dal divIcon personalizzato */
+.custom-div-icon {
+  background: none !important;
+  border: none !important;
+}

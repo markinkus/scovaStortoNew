@@ -1,162 +1,152 @@
-import React, { useState, useEffect, useRef } from 'react'; // Import useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { LatLngExpression, Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'; // Import Map as LeafletMap and LeafletMarker
-import { get } from '../services/api';
+import L from 'leaflet';
 import { Typography, CircularProgress, Alert, Box, Button, Stack } from '@mui/material';
+import { get } from '../services/api';
 import AddBusinessModal from './AddBusinessModal';
-import AnomalyFormModal from './AnomalyFormModal'; // Import AnomalyFormModal
+import AnomalyFormModal from './AnomalyFormModal';
 import { useAuth } from '../contexts/AuthContext';
-
-interface Business {
-  id: number;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  addedByUser?: { id: number; username: string }; // Optional, from include
-  anomalyCount?: number; // Optional, from include
-}
+import { Business } from '../App';
 
 interface BusinessMapProps {
   onBusinessesLoaded: (businesses: Business[]) => void;
-  selectedBusiness: Business | null; // Add selectedBusiness prop
+  selectedBusiness: Business | null;
+  onSelectBusiness: (business: Business) => void;
 }
 
-const BusinessMap: React.FC<BusinessMapProps> = ({ onBusinessesLoaded, selectedBusiness }) => {
+const getIconByType = (type?: string) => {
+  const base = new L.Icon.Default();
+  return L.divIcon({
+    html: `<img src="${base.options.iconUrl}" />`,
+    iconSize:   base.options.iconSize,
+    iconAnchor: base.options.iconAnchor,
+    popupAnchor: base.options.popupAnchor,
+    className: 'leaflet-div-icon custom-div-icon'
+  });
+};
+
+const BusinessMap: React.FC<BusinessMapProps> = ({
+  onBusinessesLoaded,
+  selectedBusiness,
+  onSelectBusiness
+}) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const mapRef = useRef<LeafletMap | null>(null); // Ref for map instance
-  const markerRefs = useRef<{ [key: number]: LeafletMarker | null }>({}); // Refs for marker instances
-  const [isAddBusinessModalOpen, setIsAddBusinessModalOpen] = useState(false);
-  const [isAnomalyModalOpen, setIsAnomalyModalOpen] = useState(false);
-  const [selectedBusinessIdForAnomaly, setSelectedBusinessIdForAnomaly] = useState<number | null>(null);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAnomOpen, setIsAnomOpen] = useState(false);
+  const [anomBizId, setAnomBizId] = useState<number | null>(null);
+
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRefs = useRef<{ [key: number]: L.Marker | null }>({});
   const { token } = useAuth();
 
-  const defaultPosition: LatLngExpression = [51.505, -0.09];
+  const defaultPosition: [number, number] = [51.505, -0.09];
 
-  const fetchBusinesses = async () => { // Make fetchBusinesses reusable
+  const fetchBusinesses = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await get<Business[]>('/businesses'); // API endpoint
+      const data = await get<Business[]>('/businesses');
       setBusinesses(data);
-      onBusinessesLoaded(data); // Call the callback with the loaded businesses
+      onBusinessesLoaded(data);
     } catch (err: any) {
-      console.error('Failed to fetch businesses. Full error:', err, 'Response data:', err.response?.data);
-      setError('Failed to fetch businesses. Please try again later.');
+      console.error(err);
+      setError('Failed to fetch businesses.');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => { fetchBusinesses(); }, []);
+
+  // Zoom + popup on selection change
   useEffect(() => {
-    fetchBusinesses();
-  }, []);
-
-  useEffect(() => {
-    if (selectedBusiness && mapRef.current && selectedBusiness.latitude && selectedBusiness.longitude) {
-      const marker = markerRefs.current[selectedBusiness.id];
-      mapRef.current.flyTo([selectedBusiness.latitude, selectedBusiness.longitude], 15);
-      if (marker) {
-        // Delay opening popup slightly to ensure map pan/zoom is complete
-        setTimeout(() => {
-          marker.openPopup();
-        }, 300); // Adjust delay as needed
-      }
-    }
-  }, [selectedBusiness]); // Effect runs when selectedBusiness changes
-
-  const handleBusinessAdded = (newBusiness: Business) => {
-    fetchBusinesses();
-    setIsAddBusinessModalOpen(false);
-  };
-
-  const handleOpenAnomalyModal = (businessId: number) => {
-    setSelectedBusinessIdForAnomaly(businessId);
-    setIsAnomalyModalOpen(true);
-  };
-
-  const handleAnomalyReported = (newAnomaly: any) => {
-    fetchBusinesses(); // Refetch businesses to update anomaly counts
-    setIsAnomalyModalOpen(false);
-    // Could also show a global success message/toast here
-  };
+    if (!selectedBusiness || !mapRef.current) return;
+    const { latitude, longitude, id } = selectedBusiness;
+    mapRef.current.flyTo([latitude, longitude], 17, { duration: 1.2 });
+    const m = markerRefs.current[id];
+    if (m) setTimeout(() => m.openPopup(), 300);
+  }, [selectedBusiness]);
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: '100%' }}>
         <CircularProgress />
       </Box>
     );
   }
-
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }
 
   return (
-    <Box sx={{ height: '100%', width: '100%', position: 'relative' }}> {/* Adjust height as needed */}
+    <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
+      {/* Bottone + Modal */}
       {token && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsAddBusinessModalOpen(true)}
-          sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1000 }}
-        >
-          Add New Business
-        </Button>
+        <>
+          <Button
+            variant="contained"
+            onClick={() => setIsAddOpen(true)}
+            sx={{ position: 'absolute', top: 16, right: 16, zIndex: theme => theme.zIndex.modal + 1 }}
+          >
+            Add New Business
+          </Button>
+          <AddBusinessModal
+            open={isAddOpen}
+            onClose={() => setIsAddOpen(false)}
+            onBusinessAdded={() => { fetchBusinesses(); setIsAddOpen(false); }}
+          />
+        </>
       )}
+
       <MapContainer
         center={defaultPosition}
-        zoom={businesses.length > 0 ? 6 : 2}
-        style={{ height: '100%', width: '100%', backgroundColor: '#f0e5d8', minHeight: '150px', minWidth: '150px' }}
-        whenCreated={instance => { mapRef.current = instance; }} // Assign map instance
+        zoom={businesses.length ? 6 : 2}
+        style={{ height: '100%', width: '100%' }}
+        whenCreated={map => (mapRef.current = map)}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution="&copy; OpenStreetMap contributors"
         />
-        {businesses.map((business) => (
+        {businesses.map(b => (
           <Marker
-            key={business.id}
-            position={[business.latitude, business.longitude]}
-            ref={el => { markerRefs.current[business.id] = el; }} // Store marker reference
+            key={b.id}
+            position={[b.latitude, b.longitude]}
+            icon={getIconByType(b.type)}
+            ref={el => (markerRefs.current[b.id] = el)}
+            eventHandlers={{ click: () => onSelectBusiness(b) }}
           >
             <Popup>
               <Stack spacing={1}>
-                <Typography variant="h6">{business.name}</Typography>
-                <Typography variant="body2">{business.address}</Typography>
-                {business.addedByUser && (
-                  <Typography variant="caption">Added by: {business.addedByUser.username}</Typography>
+                <Typography variant="h6">{b.name}</Typography>
+                <Typography variant="body2">{b.address}</Typography>
+                {b.addedByUser && (
+                  <Typography variant="caption">Added by: {b.addedByUser.username}</Typography>
                 )}
-                <Typography variant="caption">Anomalies: {business.anomalyCount || 0}</Typography>
+                <Typography variant="caption">Anomalies: {b.anomalyCount || 0}</Typography>
                 {token && (
-                  <Button 
-                    size="small" 
-                    variant="outlined" 
-                    onClick={() => handleOpenAnomalyModal(business.id)}
-                    sx={{mt: 1}}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => { setAnomBizId(b.id); setIsAnomOpen(true); }}
+                    sx={{ mt: 1 }}
                   >
                     Report Anomaly
                   </Button>
                 )}
-                {/* TODO: Link to view business details / anomalies list */}
               </Stack>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
-      <AddBusinessModal
-        open={isAddBusinessModalOpen}
-        onClose={() => setIsAddBusinessModalOpen(false)}
-        onBusinessAdded={handleBusinessAdded}
-      />
+
       <AnomalyFormModal
-        open={isAnomalyModalOpen}
-        onClose={() => setIsAnomalyModalOpen(false)}
-        businessId={selectedBusinessIdForAnomaly}
-        onAnomalyReported={handleAnomalyReported}
+        open={isAnomOpen}
+        onClose={() => setIsAnomOpen(false)}
+        businessId={anomBizId}
+        onAnomalyReported={() => { fetchBusinesses(); setIsAnomOpen(false); }}
       />
     </Box>
   );

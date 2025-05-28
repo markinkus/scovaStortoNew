@@ -6,27 +6,38 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import BusinessMap from './components/BusinessMap';
 import BusinessMenu from './components/BusinessMenu';
-import 'leaflet/dist/leaflet.css';
 
-interface Business { /* ... */ }
+export interface Business {
+  id: number;
+  name: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  type?: string;
+  addedByUser?: { id: number; username: string };
+  anomalyCount?: number;
+}
 
 function App() {
   const { token, user, logout, isLoading } = useAuth();
-  const [businessesForMenu, setBusinessesForMenu] = useState<Business[]>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
 
-  if (isLoading) return <Typography>Loading...</Typography>;
+  if (isLoading) {
+    return <Typography>Loading...</Typography>;
+  }
 
   return (
     <Router>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        {/* AppBar */}
         <AppBar position="static">
           <Toolbar>
             <Typography
               variant="h6"
               component={Link}
               to="/"
-              sx={{ color: 'inherit', textDecoration: 'none', flexGrow: 1 }}
+              sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
             >
               Anomaly Reporter
             </Typography>
@@ -44,37 +55,59 @@ function App() {
           </Toolbar>
         </AppBar>
 
-        {/* Contenitore principale */}
-        <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
-          {/* Menu */}
-          <Box sx={{
-            width: { xs: '100%', sm: '30%', md: '25%' },
-            overflowY: 'auto',
-            borderRight: '1px solid',
-            borderColor: 'divider',
-          }}>
-            <BusinessMenu
-              businesses={businessesForMenu}
-              onSelectBusiness={setSelectedBusiness}
-            />
-          </Box>
-
-          {/* Mappa */}
-          <Box sx={{ flexGrow: 1, height: '100%' }}>
-            <BusinessMap
-              onBusinessesLoaded={setBusinessesForMenu}
-              selectedBusiness={selectedBusiness}
-            />
-          </Box>
-        </Box>
-
-        {/* Rotte Login/Register */}
+        {/* Rotte */}
         <Routes>
-          <Route path="/login" element={<Container sx={{ pt: 2 }}><LoginForm/></Container>} />
-          <Route path="/register" element={<Container sx={{ pt: 2 }}><RegisterForm/></Container>} />
+          {/* Home: menu + mappa */}
+          <Route
+            path="/"
+            element={
+              <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+                <Box
+                  sx={{
+                    width: { xs: '100%', sm: '30%', md: '25%' },
+                    overflowY: 'auto',
+                    borderRight: 1,
+                    borderColor: 'divider'
+                  }}
+                >
+                  <BusinessMenu
+                    businesses={businesses}
+                    selectedBusiness={selectedBusiness}
+                    onSelectBusiness={setSelectedBusiness}
+                  />
+                </Box>
+                <Box sx={{ flexGrow: 1, height: '100%' }}>
+                  <BusinessMap
+                    onBusinessesLoaded={setBusinesses}
+                    selectedBusiness={selectedBusiness}
+                    onSelectBusiness={setSelectedBusiness}
+                  />
+                </Box>
+              </Box>
+            }
+          />
+
+          {/* Login / Register */}
+          <Route
+            path="/login"
+            element={
+              <Container sx={{ pt: 2 }}>
+                <LoginForm />
+              </Container>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Container sx={{ pt: 2 }}>
+                <RegisterForm />
+              </Container>
+            }
+          />
         </Routes>
       </Box>
     </Router>
   );
 }
+
 export default App;

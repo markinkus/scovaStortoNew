@@ -1,11 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css'; // Basic global styles (optional)
+import './index.css';                 // CSS globale (inclusa .custom-div-icon)
+import 'leaflet/dist/leaflet.css';    // Stili Leaflet
+import L from 'leaflet';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { AuthProvider } from './contexts/AuthContext';
 
-import { AuthProvider } from './contexts/AuthContext'; // Import AuthProvider
+// Override delle icone di default di Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
 // Wooden Theme Definition
 const woodenTheme = createTheme({
@@ -60,7 +69,7 @@ const woodenTheme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider theme={woodenTheme}>
-      <CssBaseline /> {/* Normalize CSS and apply baseline styles */}
+      <CssBaseline />
       <AuthProvider>
         <App />
       </AuthProvider>
