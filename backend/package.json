@@ -17,7 +17,9 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.0",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "dotenv": "^16.4.5",
+    "@google/genai": "^1.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

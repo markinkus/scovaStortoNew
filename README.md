@@ -42,9 +42,12 @@ These instructions will get you a copy of the project up and running on your loc
             ```bash
             cp .env.example .env
             ```
-        *   Open the newly created `.env` file and replace `your_very_secret_key_replace_in_prod` with a strong, unique secret for `JWT_SECRET`. This key is crucial for securing user sessions.
+        *   Open the newly created `.env` file and replace `your_very_secret_key_replace_in_prod` with a strong, unique secret for `JWT_SECRET`. Set also your Google Gemini API key in `GEMINI_API_KEY` so OCR requests can be processed server-side.
             ```env
             JWT_SECRET=your_actual_strong_secret_key_here
+            GEMINI_API_KEY=your_google_gemini_key
+            # Optional: override default model
+            GEMINI_MODEL_TEXT=gemini-2.5-flash-preview-04-17
             ```
     *   Database Synchronization:
         *   The application uses Sequelize and is configured to automatically synchronize models with the database using `sequelize.sync({ alter: true })` when the server starts. This means tables will be created or altered as needed. The SQLite database file (`database.sqlite`) will be created in the `backend` directory.
