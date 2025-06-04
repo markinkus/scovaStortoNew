@@ -11,7 +11,7 @@ interface ImagePreviewProps {
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({ src, alt, onRemove, size = 'w-24 h-24' }) => {
   return (
-    <div className={`relative group ${size} rounded-md overflow-hidden border-2 border-slate-700 shadow-md`}>
+    <div className={`relative group ${size} rounded-md overflow-hidden border-2 border-[#4a3b31] shadow-md`}>
       <img src={src} alt={alt} className="w-full h-full object-cover" />
       {onRemove && (
         <button

@@ -10,6 +10,7 @@ This project allows users to report and view anomalies associated with businesse
 *   Authenticated users can report anomalies for specific businesses, optionally including a photo URL.
 *   Publicly viewable list of businesses and their reported anomalies.
 *   Users can update/delete businesses and anomalies they created.
+*   A wooden-inspired user interface with a repeating brown gradient background.
 
 ## Getting Started
 
@@ -37,15 +38,16 @@ These instructions will get you a copy of the project up and running on your loc
         ```bash
         npm install
         ```
-    *   Set up environment variables:
-        *   Copy the example environment file:
-            ```bash
-            cp .env.example .env
-            ```
-        *   Open the newly created `.env` file and replace `your_very_secret_key_replace_in_prod` with a strong, unique secret for `JWT_SECRET`. This key is crucial for securing user sessions.
-            ```env
-            JWT_SECRET=your_actual_strong_secret_key_here
-            ```
+    *   Set up environment variables at the project root:
+        ```bash
+        cp .env.example ../.env
+        ```
+        Then edit `../.env` and replace `your_very_secret_key_replace_in_prod` with a strong secret for `JWT_SECRET`. Provide your Gemini key in `GEMINI_API_KEY` and optionally override the model:
+        ```env
+        JWT_SECRET=your_actual_strong_secret_key_here
+        GEMINI_API_KEY=your_google_gemini_key
+        GEMINI_MODEL_TEXT=gemini-2.5-flash-preview-04-17
+        ```
     *   Database Synchronization:
         *   The application uses Sequelize and is configured to automatically synchronize models with the database using `sequelize.sync({ alter: true })` when the server starts. This means tables will be created or altered as needed. The SQLite database file (`database.sqlite`) will be created in the `backend` directory.
     *   Start the backend server:

@@ -95,7 +95,7 @@ const App: React.FC = () => {
     : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
+    <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto p-4 md:p-6 flex flex-col">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-grow min-h-0">
@@ -111,12 +111,12 @@ const App: React.FC = () => {
           {/* Colonna Lista Attività e Dettagli */}
           <div className="lg:col-span-2 flex flex-col h-auto lg:h-full space-y-2 min-h-0">
             {/* Business List Section */}
-            <div 
-              className="flex flex-col space-y-3 p-1 bg-slate-900/50 rounded-lg border border-slate-700/50 shadow-inner" 
+            <div
+              className="flex flex-col space-y-3 p-1 bg-[#f0e5d8]/70 rounded-lg border border-[#7a6a5c]/50 shadow-inner"
               style={{ flexGrow: 1, flexShrink: 1, flexBasis: '45%' }}
             >
-              <div className="flex justify-between items-center border-b-2 border-cyan-700 pb-2 px-2 pt-1 flex-shrink-0">
-                <h2 className="text-xl font-semibold text-cyan-400">Attività Commerciali</h2>
+              <div className="flex justify-between items-center border-b-2 border-[#7a6a5c] pb-2 px-2 pt-1 flex-shrink-0">
+                <h2 className="text-xl font-semibold text-[#4a3b31]">Attività Commerciali</h2>
                 <button
                   onClick={() => setIsAddBusinessModalOpen(true)}
                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-1.5 px-3 rounded-md inline-flex items-center transition-colors shadow-md hover:shadow-lg shadow-green-500/30 text-sm"
@@ -126,10 +126,10 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="px-2 flex-shrink-0">
-                <input 
+                <input
                   type="text"
                   placeholder="Cerca attività, località, tipo..."
-                  className="w-full p-2 rounded-md bg-slate-800 border border-slate-700 focus:ring-cyan-500 focus:border-cyan-500 placeholder-slate-500"
+                  className="w-full p-2 rounded-md bg-[#f0e5d8] border border-[#7a6a5c] focus:ring-[#7a6a5c] focus:border-[#7a6a5c] placeholder-[#7a6a5c]"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -145,47 +145,47 @@ const App: React.FC = () => {
                     />
                   ))
                 ) : (
-                  <p className="text-slate-500 text-center py-4">Nessuna attività trovata.</p>
+                  <p className="text-[#6a5a4c] text-center py-4">Nessuna attività trovata.</p>
                 )}
               </div>
             </div>
 
             {/* Selected Business Details & Anomalies Section */}
-            <div 
-              className="flex flex-col space-y-3 p-1 bg-slate-900/50 rounded-lg border border-slate-700/50 shadow-inner" 
+            <div
+              className="flex flex-col space-y-3 p-1 bg-[#f0e5d8]/70 rounded-lg border border-[#7a6a5c]/50 shadow-inner"
               style={{ flexGrow: 1, flexShrink: 1, flexBasis: '55%' }}
             >
               {selectedBusiness ? (
                 <>
-                  <div className="bg-slate-800 p-3 rounded-lg shadow-md border border-slate-700 flex-shrink-0 mx-1 mt-1">
+                  <div className="bg-[#f0e5d8] p-3 rounded-lg shadow-md border border-[#7a6a5c] flex-shrink-0 mx-1 mt-1">
                     <div className="flex justify-between items-center mb-1">
-                      <h2 className="text-xl font-semibold text-cyan-300 truncate" title={selectedBusiness.name}>{selectedBusiness.name}</h2>
+                      <h2 className="text-xl font-semibold text-[#4a3b31] truncate" title={selectedBusiness.name}>{selectedBusiness.name}</h2>
                       <button 
                         onClick={() => setIsAnomalyFormOpen(true)}
-                        className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1.5 px-3 rounded-md inline-flex items-center transition-colors shadow-md hover:shadow-lg shadow-cyan-500/30 text-sm flex-shrink-0 ml-2"
+                        className="bg-[#7a6a5c] hover:bg-[#5f4e42] text-white font-semibold py-1.5 px-3 rounded-md inline-flex items-center transition-colors shadow-md hover:shadow-lg shadow-[#7a6a5c]/30 text-sm flex-shrink-0 ml-2"
                       >
                         <PlusCircleIcon className="w-4 h-4 mr-1.5"/> Segnala
                       </button>
                     </div>
-                    <p className="text-xs text-slate-400">{selectedBusiness.address} - {selectedBusiness.location} ({selectedBusiness.type})</p>
-                    {selectedBusiness.piva && <p className="text-xs text-slate-500 mt-0.5">P.IVA: {selectedBusiness.piva}</p>}
+                    <p className="text-xs text-[#6a5a4c]">{selectedBusiness.address} - {selectedBusiness.location} ({selectedBusiness.type})</p>
+                    {selectedBusiness.piva && <p className="text-xs text-[#6a5a4c] mt-0.5">P.IVA: {selectedBusiness.piva}</p>}
                   </div>
-                  <h3 className="text-lg font-semibold text-cyan-300 border-b border-cyan-700 pb-1 flex-shrink-0 px-2">Anomalie Segnalate ({anomaliesForSelectedBusiness.length})</h3>
+                  <h3 className="text-lg font-semibold text-[#4a3b31] border-b border-[#7a6a5c] pb-1 flex-shrink-0 px-2">Anomalie Segnalate ({anomaliesForSelectedBusiness.length})</h3>
                   <div className="overflow-y-auto flex-grow pr-1 pl-2 space-y-3 min-h-0">
                     {anomaliesForSelectedBusiness.length > 0 ? (
                       anomaliesForSelectedBusiness.map(anomaly => (
                         <AnomalyCard key={anomaly.id} anomaly={anomaly} />
                       ))
                     ) : (
-                      <p className="text-slate-500 text-center py-4">Nessuna anomalia segnalata per questa attività.</p>
+                      <p className="text-[#6a5a4c] text-center py-4">Nessuna anomalia segnalata per questa attività.</p>
                     )}
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full bg-slate-800/30 rounded-lg border-2 border-dashed border-slate-700 p-6">
-                  <AlertTriangleIcon className="w-12 h-12 text-slate-600 mb-3" />
-                  <h2 className="text-lg text-slate-500">Seleziona un'attività</h2>
-                  <p className="text-slate-600 text-sm text-center">Visualizza i dettagli qui selezionando un'attività dalla lista o cliccando un marcatore sulla mappa.</p>
+                <div className="flex flex-col items-center justify-center h-full bg-[#f0e5d8]/50 rounded-lg border-2 border-dashed border-[#7a6a5c] p-6">
+                  <AlertTriangleIcon className="w-12 h-12 text-[#7a6a5c] mb-3" />
+                  <h2 className="text-lg text-[#6a5a4c]">Seleziona un'attività</h2>
+                  <p className="text-[#7a6a5c] text-sm text-center">Visualizza i dettagli qui selezionando un'attività dalla lista o cliccando un marcatore sulla mappa.</p>
                 </div>
               )}
             </div>

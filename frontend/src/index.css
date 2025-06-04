@@ -5,6 +5,15 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #d7c7b7;
+  background-image: repeating-linear-gradient(90deg,#d3b38c 0,#d3b38c 10px,#c49a6c 10px,#c49a6c 20px);
+  background-size: 400px 400px;
+  background-repeat: repeat;
+  color: #4a3b31;
+}
+
+a {
+  color: #7a6a5c;
 }
 
 code {

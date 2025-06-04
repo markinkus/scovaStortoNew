@@ -23,12 +23,12 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[100] p-4 transition-opacity duration-300 ease-in-out opacity-100">
-      <div className={`bg-slate-800 p-6 rounded-lg shadow-2xl shadow-cyan-500/30 w-full ${sizeClasses[size]} transform transition-all duration-300 ease-in-out scale-100 max-h-[90vh] flex flex-col`}>
+      <div className={`bg-[#f0e5d8] p-6 rounded-lg shadow-2xl shadow-[#7a6a5c]/30 w-full ${sizeClasses[size]} transform transition-all duration-300 ease-in-out scale-100 max-h-[90vh] flex flex-col`}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold text-cyan-400">{title}</h2>
+          <h2 className="text-2xl font-semibold text-[#4a3b31]">{title}</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-cyan-400 transition-colors"
+            className="text-[#4a3b31] hover:text-[#7a6a5c] transition-colors"
             aria-label="Chiudi modale"
           >
             <XCircleIcon className="w-8 h-8" />
