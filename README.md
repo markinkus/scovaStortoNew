@@ -10,6 +10,7 @@ This project allows users to report and view anomalies associated with businesse
 *   Authenticated users can report anomalies for specific businesses, optionally including a photo URL.
 *   Publicly viewable list of businesses and their reported anomalies.
 *   Users can update/delete businesses and anomalies they created.
+*   A wooden-inspired user interface with a repeating brown gradient background.
 
 ## Getting Started
 
@@ -37,6 +38,7 @@ These instructions will get you a copy of the project up and running on your loc
         ```bash
         npm install
         ```
+
     *   Set up environment variables:
         *   Copy the example environment file:
             ```bash

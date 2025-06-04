@@ -1,7 +1,7 @@
 // backend/index.js
-require('dotenv').config();
-const express = require('express');
 const path = require('path'); // Import path module
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const express = require('express');
 const sequelize = require('./database'); // Importa l'istanza da backend/database.js
 const authRoutes = require('./routes/auth');
 const businessRoutes = require('./routes/businessRoutes');
