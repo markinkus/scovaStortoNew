@@ -1,10 +1,12 @@
 // backend/index.js
+require('dotenv').config();
 const express = require('express');
 const path = require('path'); // Import path module
 const sequelize = require('./database'); // Importa l'istanza da backend/database.js
 const authRoutes = require('./routes/auth');
 const businessRoutes = require('./routes/businessRoutes');
 const anomalyRoutes = require('./routes/anomalyRoutes');
+const geminiRoutes = require('./routes/geminiRoutes');
 
 // Importa i modelli
 const User = require('./models/User');
@@ -42,6 +44,7 @@ sequelize.authenticate()
 app.use('/api/auth', authRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use('/api/anomalies', anomalyRoutes);
+app.use('/api/gemini', geminiRoutes);
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
