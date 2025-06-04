@@ -1,15 +1,16 @@
+// api.ts
 import axios from 'axios';
 
-const API_BASE_URL = '/api'; // Vite will proxy this
+const API_BASE_URL = '/api'; // Vite proxy
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+// -  headers: {
+// -    'Content-Type': 'application/json',
+// -  },
 });
 
-// Interceptor to add JWT token to requests
+// Interceptor per aggiungere JWT se presente
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,21 +24,31 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Generic request functions
+// GET rimane uguale
 export const get = async <T>(url: string, params?: object): Promise<T> => {
   try {
     const response = await apiClient.get<T>(url, { params });
     return response.data;
   } catch (error) {
-    // Basic error handling, can be expanded
     console.error(`GET ${url} failed:`, error);
     throw error;
   }
 };
 
+// POST: rimuoviamo l’header “Content-Type” di default
 export const post = async <T>(url: string, data: any): Promise<T> => {
   try {
-    const response = await apiClient.post<T>(url, data);
+    // Se data è FormData, non impostare manualmente Content-Type
+    let config = {};
+    if (data instanceof FormData) {
+      config = {
+        headers: {
+          // Lasciare che Axios imposti multipart/form-data+boundary
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+    }
+    const response = await apiClient.post<T>(url, data, config);
     return response.data;
   } catch (error) {
     console.error(`POST ${url} failed:`, error);
@@ -45,6 +56,7 @@ export const post = async <T>(url: string, data: any): Promise<T> => {
   }
 };
 
+// PUT e DELETE rimangono inalterati (se non usano FormData)
 export const put = async <T>(url: string, data: any): Promise<T> => {
   try {
     const response = await apiClient.put<T>(url, data);
@@ -64,8 +76,5 @@ export const del = async <T>(url: string): Promise<T> => {
     throw error;
   }
 };
-
-// Specific API service functions can be added here if needed,
-// e.g., authService.ts, businessService.ts
 
 export default apiClient;

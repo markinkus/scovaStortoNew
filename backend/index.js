@@ -17,7 +17,9 @@ const app = express();
 const port = process.env.PORT || 3001; // Usa process.env.PORT o 3001 come fallback
 
 // Middleware per parsare JSON
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
 // Colleziona tutti i modelli in un oggetto per le associazioni
 const models = {

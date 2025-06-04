@@ -1,4 +1,4 @@
-# Anomaly Reporter Project
+# ScovaStorto Project
 
 This project allows users to report and view anomalies associated with businesses on a map. It features a React frontend built with Vite and MUI, and a Node.js/Express backend with a SQLite database.
 
@@ -83,5 +83,5 @@ These instructions will get you a copy of the project up and running on your loc
 *   **Frontend (Vite)**: `http://localhost:3000` (or next available, e.g., 5173)
 *   **Backend (Node.js/Express)**: `http://localhost:3001`
 
-You should now have the Anomaly Reporter application running locally! You can register a new user, log in, add businesses, and report anomalies.
+You should now have the ScovaStorto application running locally! You can register a new user, log in, add businesses, and report anomalies.
 ```

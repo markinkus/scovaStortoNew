@@ -11,7 +11,7 @@ import { Business, Anomaly } from './types';
 import { MOCK_BUSINESSES_DATA_KEY, MOCK_ANOMALIES_DATA_KEY } from './constants';
 import { PlusCircleIcon } from './components/icons/PlusCircleIcon';
 import { AlertTriangleIcon } from './components/icons/AlertTriangleIcon';
-import { checkApiKey } from './services/geminiService';
+import { checkApiKey } from './frontend/src/services/geminiService';
 
 // Dati fittizi con coordinate
 const initialMockBusinesses: Business[] = [
