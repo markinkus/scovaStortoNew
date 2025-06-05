@@ -245,7 +245,6 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
             onChange={handleChange}
             required
             disabled={submitting || geocodingInProgress}
-            disabled={submitting || geocodingInProgress}
           />
           <TextField
             margin="dense"
