@@ -283,7 +283,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
               disabled={submitting || geocodingInProgress}
             />
             <label htmlFor="photo-upload">
-              <Button variant="outlined" component="span" onClick={handleUploadButtonClick} disabled={submitting || geocodingInProgress}>
+              <Button variant="outlined" component="span" disabled={submitting || geocodingInProgress}>
                 Carica Foto Negozio
               </Button>
             </label>

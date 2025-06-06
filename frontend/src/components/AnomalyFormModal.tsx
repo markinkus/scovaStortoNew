@@ -414,8 +414,7 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({ open, onClose, busi
             <label htmlFor="receipt-file-upload">
               <Button 
                 variant="outlined" 
-                component="span" 
-                onClick={() => receiptFileInputRef.current?.click()}
+                component="span"
                 disabled={submitting || ocrInProgress}
                 fullWidth
               >
@@ -430,7 +429,7 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({ open, onClose, busi
             {ocrInProgress && (
               <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                 <CircularProgress size={20} sx={{ mr: 1 }} />
-                <Typography variant="body2">Elaborazione OCR in corso...</Typography>
+                <Typography variant="body2">Elaborazione in corso...</Typography>
               </Box>
             )}
           </Box>
@@ -537,7 +536,6 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({ open, onClose, busi
               <Button 
                 variant="outlined" 
                 component="span" 
-                onClick={() => anomalyPhotosInputRef.current?.click()}
                 disabled={submitting || ocrInProgress}
                 fullWidth
               >
