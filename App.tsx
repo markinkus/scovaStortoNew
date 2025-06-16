@@ -6,6 +6,7 @@ import { BusinessCard } from './components/BusinessCard';
 import { AnomalyCard } from './components/AnomalyCard';
 import { AnomalyFormModal } from './components/AnomalyFormModal';
 import { AddBusinessModal } from './components/AddBusinessModal'; // Importa il nuovo modale
+import { BusinessDetailsModal } from './components/BusinessDetailsModal';
 import { BusinessMap } from './components/BusinessMap';
 import { Business, Anomaly } from './types';
 import { MOCK_BUSINESSES_DATA_KEY, MOCK_ANOMALIES_DATA_KEY } from './constants';
@@ -51,6 +52,7 @@ const App: React.FC = () => {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [isAnomalyFormOpen, setIsAnomalyFormOpen] = useState(false);
   const [isAddBusinessModalOpen, setIsAddBusinessModalOpen] = useState(false); // Stato per il nuovo modale
+  const [isBusinessDetailsOpen, setIsBusinessDetailsOpen] = useState(false);
   const [isApiKeyAvailable, setIsApiKeyAvailable] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -69,6 +71,9 @@ const App: React.FC = () => {
   const handleSelectBusiness = (businessId: string) => {
     const business = businesses.find(b => b.id === businessId);
     setSelectedBusiness(business || null);
+    if (business) {
+      setIsBusinessDetailsOpen(true);
+    }
   };
 
   const handleAddAnomaly = (newAnomaly: Anomaly) => {
@@ -195,12 +200,21 @@ const App: React.FC = () => {
       <Footer />
 
       {selectedBusiness && (
-        <AnomalyFormModal 
+        <AnomalyFormModal
           isOpen={isAnomalyFormOpen}
           onClose={() => setIsAnomalyFormOpen(false)}
           business={selectedBusiness}
           onAddAnomaly={handleAddAnomaly}
           isApiKeyAvailable={isApiKeyAvailable}
+        />
+      )}
+
+      {selectedBusiness && (
+        <BusinessDetailsModal
+          isOpen={isBusinessDetailsOpen}
+          business={selectedBusiness}
+          anomalies={anomaliesForSelectedBusiness}
+          onClose={() => setIsBusinessDetailsOpen(false)}
         />
       )}
 
