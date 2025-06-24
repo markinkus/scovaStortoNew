@@ -1,0 +1,19 @@
+{
+  "services": [
+    {
+      "name": "scovastorto-backend",
+      "rootDir": "backend",
+      "startCommand": "npm start",
+      "buildCommand": "npm install"
+    },
+    {
+      "name": "scovastorto-frontend",
+      "rootDir": "frontend",
+      "startCommand": "npm run preview",
+      "buildCommand": "npm install && npm run build",
+      "static": {
+        "publishDir": "dist"
+      }
+    }
+  ]
+}

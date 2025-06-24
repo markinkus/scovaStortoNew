@@ -43,7 +43,7 @@ function App() {
             </Typography>
             {token ? (
               <>
-                <Typography sx={{ mr: 2 }}>Hi, {user.username}</Typography>
+                <Typography sx={{ mr: 2 }}>Hi, {user!.username}</Typography>
                 <Button color="inherit" onClick={logout}>Logout</Button>
               </>
             ) : (

@@ -9,7 +9,7 @@ import { AddBusinessModal } from './components/AddBusinessModal'; // Importa il 
 import { BusinessDetailsModal } from './components/BusinessDetailsModal';
 import { BusinessMap } from './components/BusinessMap';
 import { Business, Anomaly } from './types';
-import { MOCK_BUSINESSES_DATA_KEY, MOCK_ANOMALIES_DATA_KEY } from './constants';
+import { MOCK_BUSINESSES_DATA_KEY, MOCK_ANOMALIES_DATA_KEY } from './constants.ts';
 import { PlusCircleIcon } from './components/icons/PlusCircleIcon';
 import { AlertTriangleIcon } from './components/icons/AlertTriangleIcon';
 import { checkApiKey } from './frontend/src/services/geminiService';

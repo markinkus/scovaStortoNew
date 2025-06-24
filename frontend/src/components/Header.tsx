@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { APP_TITLE, APP_SLOGAN } from '../constants';
-import { AlertTriangleIcon } from './icons/AlertTriangleIcon';
+import { APP_TITLE, APP_SLOGAN } from '../../constants';
+import { AlertTriangleIcon } from '../../../components/icons/AlertTriangleIcon';
 
 export const Header: React.FC = () => {
   return (

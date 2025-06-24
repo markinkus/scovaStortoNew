@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { XCircleIcon } from './icons/XCircleIcon';
+import { XCircleIcon } from '../../../components/icons/XCircleIcon';
 
 interface ImagePreviewProps {
   src: string;

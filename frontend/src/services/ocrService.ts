@@ -1,5 +1,5 @@
 
-import { ParsedReceiptInfo } from "../types";
+import { ParsedReceiptInfo } from "../../types";
 
 // Simula il caricamento e l'utilizzo di una libreria OCR client-side come PaddlePaddle.
 // In uno scenario reale, ciò comporterebbe il caricamento di un modello WASM,

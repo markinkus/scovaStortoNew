@@ -3,9 +3,8 @@ import React, { useState, useCallback, ChangeEvent } from 'react';
 import { Business, Anomaly, ParsedReceiptInfo } from '../types';
 import { Modal } from './Modal';
 import { LoadingSpinner } from './LoadingSpinner';
-import { extractTextWithGemini } from '../services/geminiService'; // Modificato
+import { extractTextWithGemini } from '../frontend/src/services/geminiService'; // Modificato
 import { ImagePreview } from './ImagePreview';
-import { UploadIcon } from './icons/UploadIcon';
 import { ReceiptIcon } from './icons/ReceiptIcon';
 import { CameraIcon } from './icons/CameraIcon';
 

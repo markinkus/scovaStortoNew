@@ -1,5 +1,5 @@
 import { get, post } from './api';
-import { ParsedReceiptInfo } from '../types';
+import { ParsedReceiptInfo } from '../../types';
 
 export const checkApiKey = async (): Promise<boolean> => {
   try {

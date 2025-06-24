@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { APP_TITLE, APP_SLOGAN } from '../constants';
+import { APP_TITLE, APP_SLOGAN } from '../constants.ts';
 import { AlertTriangleIcon } from './icons/AlertTriangleIcon';
 
 export const Header: React.FC = () => {

@@ -73,7 +73,9 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({
             key={b.id}
             selected={selectedBusiness?.id === b.id}
             onClick={() => onSelectBusiness(b)}
-            ref={el => (itemRefs.current[b.id] = el)}
+            ref={el => {
+              itemRefs.current[b.id] = el;
+            }}
             sx={{
               borderBottom: '1px solid',
               borderColor: 'divider',
