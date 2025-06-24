@@ -19,7 +19,7 @@
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
     "@types/react-leaflet": "^3.0.0",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
