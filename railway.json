@@ -1,6 +1,12 @@
 {
   "services": [
     {
+      "name": "root-install",
+      "rootDir": ".",
+      "buildCommand": "npm install",
+      "startCommand": "echo 'done'"
+    },
+    {
       "name": "scovastorto-backend",
       "rootDir": "backend",
       "startCommand": "npm start",
