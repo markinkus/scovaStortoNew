@@ -16,7 +16,14 @@ const Anomaly = require('./models/Anomaly');
 
 const app = express();
 const port = process.env.PORT || 3001;
+// 1️⃣ Static serve della dist di Vue
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
+// 2️⃣ Catch-all per tutte le altre richieste (non /api)
+//    rimanda sempre all’index.html di Vue
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 // Middleware generali
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
