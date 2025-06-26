@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Chip, Button } from '@mui/material';
-import { MapPinIcon } from './icons/MapPinIcon';
-import { InfoCircleIcon } from './icons/InfoCircleIcon';
+import { MapPinIcon } from '../../../components/icons/MapPinIcon';
+import { InfoCircleIcon } from '../../../components/icons/InfoCircleIcon';
 
 interface Business {
   id: number;

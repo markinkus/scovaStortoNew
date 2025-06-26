@@ -108,7 +108,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
         {businesses.map(b => (
           <Marker
             key={b.id}
-            position={[b.latitude, b.longitude]}
+            position={[b.latitude!, b.longitude!]}
             icon={getIconByType(b.type)}
             ref={ref => { markerRefs.current[b.id] = ref; }}
             eventHandlers={{ click: () => onSelectBusiness(b) }}

@@ -79,11 +79,6 @@ function App() {
                     selectedBusiness={selectedBusiness}
                     // Solo selezione
                     onSelectBusiness={(b) => setSelectedBusiness(b)}
-                    // Solo apertura dettagli
-                    onOpenDetails={(b) => {
-                      setSelectedBusiness(b);
-                      setInfoOpen(true);
-                    }}
                   />
                 </Box>
 
@@ -95,7 +90,7 @@ function App() {
                     // Solo selezione
                     onSelectBusiness={(b) => setSelectedBusiness(b)}
                     // Solo apertura dettagli
-                    onOpenDetails={(b) => {
+                    onOpenDetails={(b: Business) => {
                       setSelectedBusiness(b);
                       setInfoOpen(true);
                     }}
