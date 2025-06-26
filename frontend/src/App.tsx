@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import BusinessMap from './components/BusinessMap';
 import BusinessMenu from './components/BusinessMenu';
+import BusinessInfoDialog from './components/BusinessInfoDialog';
 
 export interface Business {
   id: number;
@@ -16,12 +17,14 @@ export interface Business {
   type?: string;
   addedByUser?: { id: number; username: string };
   anomalyCount?: number;
+  photo_base64?: string | null;
 }
 
 function App() {
   const { token, user, logout, isLoading } = useAuth();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   if (isLoading) {
     return <Typography>Loading...</Typography>;
@@ -73,14 +76,14 @@ function App() {
                   <BusinessMenu
                     businesses={businesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={setSelectedBusiness}
+                    onSelectBusiness={(b) => { setSelectedBusiness(b); setInfoOpen(true); }}
                   />
                 </Box>
                 <Box sx={{ flexGrow: 1, height: '100%' }}>
                   <BusinessMap
                     onBusinessesLoaded={setBusinesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={setSelectedBusiness}
+                    onSelectBusiness={(b) => { setSelectedBusiness(b); setInfoOpen(true); }}
                   />
                 </Box>
               </Box>
@@ -106,6 +109,13 @@ function App() {
           />
         </Routes>
       </Box>
+            {selectedBusiness && (
+        <BusinessInfoDialog
+          businessId={selectedBusiness.id}
+          open={infoOpen}
+          onClose={() => setInfoOpen(false)}
+        />
+      )}
     </Router>
   );
 }

@@ -84,4 +84,18 @@ These instructions will get you a copy of the project up and running on your loc
 *   **Backend (Node.js/Express)**: `http://localhost:3001`
 
 You should now have the ScovaStorto application running locally! You can register a new user, log in, add businesses, and report anomalies.
+
+# Deploy Settings
+
+## Build Command:
+```bash
+npm install && cd frontend && npm install && npm run build && cd ../backend && npm install
+```
+
+## Start Command:
+```bash
+cd backend && npm start
+```
+
+
 ```
