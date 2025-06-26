@@ -1,11 +1,12 @@
-
 import React from 'react';
 import { Business } from '../types';
 import { MapPinIcon } from './icons/MapPinIcon';
+import { InfoButton } from './InfoButton';
 
 interface BusinessCardProps {
   business: Business;
   onSelectBusiness: (businessId: string) => void;
+  onOpenDetails: (businessId: string) => void;
   isSelected: boolean;
 }
 
@@ -17,7 +18,7 @@ const typeColors: Record<Business['type'], string> = {
   Negozio: 'bg-green-500/20 text-green-300 border-green-500',
 };
 
-export const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelectBusiness, isSelected }) => {
+export const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelectBusiness, onOpenDetails, isSelected }) => {
   const typeStyle = typeColors[business.type] || 'bg-slate-600/20 text-slate-300 border-slate-500';
 
   return (
@@ -34,18 +35,21 @@ export const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelectBu
       )}
       <div className="flex-grow">
         <div className="flex justify-between items-start mb-0.5">
-          <h3 className="text-lg font-semibold text-cyan-400 leading-tight">{business.name}</h3>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${typeStyle} ml-2 flex-shrink-0`}>
-            {business.type}
-          </span>
+          <h3 className="text-lg font-semibold text-cyan-400 leading-tight truncate">{business.name}</h3>
+          <div className="flex items-center space-x-1">
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${typeStyle}`}>
+              {business.type}
+            </span>
+            <InfoButton onClick={() => onOpenDetails(business.id)} />
+          </div>
         </div>
-        <p className="text-sm text-slate-400 mb-1">{business.address}</p>
+        <p className="text-sm text-slate-400 mb-1 truncate">{business.address}</p>
         <div className="flex items-center text-xs text-slate-500 mb-0.5">
           <MapPinIcon className="w-3 h-3 mr-1 text-cyan-600" />
-          <span>{business.location}</span>
+          <span className="truncate">{business.location}</span>
         </div>
         {business.piva && (
-          <p className="text-xs text-slate-600">P.IVA: {business.piva}</p>
+          <p className="text-xs text-slate-600 truncate">P.IVA: {business.piva}</p>
         )}
       </div>
     </div>

@@ -65,6 +65,7 @@ function App() {
             path="/"
             element={
               <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+                {/* Lista attività */}
                 <Box
                   sx={{
                     width: { xs: '100%', sm: '30%', md: '25%' },
@@ -76,14 +77,28 @@ function App() {
                   <BusinessMenu
                     businesses={businesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={(b) => { setSelectedBusiness(b); setInfoOpen(true); }}
+                    // Solo selezione
+                    onSelectBusiness={(b) => setSelectedBusiness(b)}
+                    // Solo apertura dettagli
+                    onOpenDetails={(b) => {
+                      setSelectedBusiness(b);
+                      setInfoOpen(true);
+                    }}
                   />
                 </Box>
+
+                {/* Mappa */}
                 <Box sx={{ flexGrow: 1, height: '100%' }}>
                   <BusinessMap
                     onBusinessesLoaded={setBusinesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={(b) => { setSelectedBusiness(b); setInfoOpen(true); }}
+                    // Solo selezione
+                    onSelectBusiness={(b) => setSelectedBusiness(b)}
+                    // Solo apertura dettagli
+                    onOpenDetails={(b) => {
+                      setSelectedBusiness(b);
+                      setInfoOpen(true);
+                    }}
                   />
                 </Box>
               </Box>
@@ -108,14 +123,16 @@ function App() {
             }
           />
         </Routes>
+
+        {/* Dialog dettagli */}
+        {selectedBusiness && (
+          <BusinessInfoDialog
+            businessId={selectedBusiness.id}
+            open={infoOpen}
+            onClose={() => setInfoOpen(false)}
+          />
+        )}
       </Box>
-            {selectedBusiness && (
-        <BusinessInfoDialog
-          businessId={selectedBusiness.id}
-          open={infoOpen}
-          onClose={() => setInfoOpen(false)}
-        />
-      )}
     </Router>
   );
 }

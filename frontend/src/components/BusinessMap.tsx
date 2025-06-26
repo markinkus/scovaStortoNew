@@ -7,10 +7,8 @@ import { get } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import AddBusinessModal from './AddBusinessModal';
 import AnomalyFormModal from './AnomalyFormModal';
+import { InfoCircleIcon } from '../../../components/icons/InfoCircleIcon';
 import { Business } from '../App';  // l'interfaccia Business condivisa
-
-// Override di default delle icone (puoi continuare a tenere questo in main.tsx)
-// --- vedi il tuo main.tsx già configurato con mergeOptions ---
 
 // Generatore di icona (usa sempre il divIcon predefinito + la custom-div-icon)
 const getIconByType = (type?: string) => {
@@ -24,12 +22,8 @@ const getIconByType = (type?: string) => {
   });
 };
 
-// Component interno che, ogni volta che cambia `selected`, chiama flyTo e apre il popup.
-// Deve trovarsi dentro MapContainer per usare useMap()
-const FlyToSelected: React.FC<{
-  selected: Business | null;
-  markerRefs: React.MutableRefObject<Record<number, L.Marker | null>>;
-}> = ({ selected, markerRefs }) => {
+// Effetto per flyTo e apertura popup sul marker selezionato
+const FlyToSelected: React.FC<{selected: Business | null; markerRefs: React.MutableRefObject<Record<number, L.Marker | null>>}> = ({ selected, markerRefs }) => {
   const map = useMap();
   useEffect(() => {
     if (!selected) return;
@@ -45,24 +39,25 @@ interface BusinessMapProps {
   onBusinessesLoaded: (businesses: Business[]) => void;
   selectedBusiness:   Business | null;
   onSelectBusiness:   (business: Business) => void;
+  onOpenDetails:      (business: Business) => void;
 }
 
 const BusinessMap: React.FC<BusinessMapProps> = ({
   onBusinessesLoaded,
   selectedBusiness,
-  onSelectBusiness
+  onSelectBusiness,
+  onOpenDetails
 }) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isAnomOpen, setIsAnomOpen] = useState(false);
-  const [anomBizId, setAnomBizId] = useState<number | null>(null);
+  const [anomBiz, setAnomBiz] = useState<Business | null>(null);
 
   const markerRefs = useRef<Record<number, L.Marker | null>>({});
   const { token } = useAuth();
 
-  // Carica i dati e li “leva su” in App
   const fetchBusinesses = async () => {
     setLoading(true);
     setError(null);
@@ -81,11 +76,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
   useEffect(() => { fetchBusinesses(); }, []);
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: '100%' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: '100%' }}><CircularProgress/></Box>;
   }
   if (error) {
     return <Alert severity="error">{error}</Alert>;
@@ -110,63 +101,48 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
         </>
       )}
 
-      <MapContainer
-        center={[51.505, -0.09]}
-        zoom={businesses.length ? 6 : 2}
-        style={{ height: '100%', width: '100%' }}
-      >
-        {/* Questo piccolo componente si occupa di zoom/fly quando cambia selectedBusiness */}
+      <MapContainer center={[51.505, -0.09]} zoom={businesses.length ? 6 : 2} style={{ height: '100%', width: '100%' }}>
         <FlyToSelected selected={selectedBusiness} markerRefs={markerRefs} />
-
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap contributors"
-        />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap contributors" />
 
         {businesses.map(b => (
           <Marker
             key={b.id}
-            position={[b.latitude as number, b.longitude as number]}
+            position={[b.latitude, b.longitude]}
             icon={getIconByType(b.type)}
             ref={ref => { markerRefs.current[b.id] = ref; }}
-            eventHandlers={{
-              click: () => onSelectBusiness(b)
-            }}
+            eventHandlers={{ click: () => onSelectBusiness(b) }}
           >
             <Popup>
               <Stack spacing={1}>
                 <Typography variant="h6">{b.name}</Typography>
                 <Typography variant="body2">{b.address}</Typography>
-                {b.addedByUser && (
-                  <Typography variant="caption">
-                    Added by: {b.addedByUser.username}
-                  </Typography>
-                )}
-                <Typography variant="caption">
-                  Anomalies: {b.anomalyCount || 0}
-                </Typography>
-                {token && (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => { setAnomBizId(b.id); setIsAnomOpen(true); }}
-                    sx={{ mt: 1 }}
-                  >
-                    Report Anomaly
+                {b.addedByUser && <Typography variant="caption">Added by: {b.addedByUser.username}</Typography>}
+                <Typography variant="caption">Anomalies: {b.anomalyCount || 0}</Typography>
+                <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                  {token && (
+                    <Button size="small" variant="outlined" onClick={e => { e.stopPropagation(); setAnomBiz(b); setIsAnomOpen(true); }}>
+                      Report Anomaly
+                    </Button>
+                  )}
+                  <Button size="small" variant="outlined" onClick={e => { e.stopPropagation(); onOpenDetails(b); }}>
+                    <InfoCircleIcon /> Details
                   </Button>
-                )}
+                </Box>
               </Stack>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
 
-      <AnomalyFormModal
-        open={isAnomOpen}
-        onClose={() => setIsAnomOpen(false)}
-        businessId={anomBizId}
-        onAnomalyReported={() => { fetchBusinesses(); setIsAnomOpen(false); }}
-      />
+      {anomBiz && (
+        <AnomalyFormModal
+          open={isAnomOpen}
+          onClose={() => setIsAnomOpen(false)}
+          businessId={anomBiz.id}
+          onAnomalyReported={() => { fetchBusinesses(); setIsAnomOpen(false); }}
+        />
+      )}
     </Box>
   );
 };

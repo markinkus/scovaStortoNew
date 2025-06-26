@@ -16,7 +16,11 @@ export const BusinessDetailsModal: React.FC<BusinessDetailsModalProps> = ({ isOp
     <Modal isOpen={isOpen} onClose={onClose} title={`Dettagli ${business.name}`} size="xl">
       {business.photoBase64 && (
         <div className="mb-4 flex justify-center">
-          <img src={business.photoBase64} alt={business.name} className="max-h-60 object-contain rounded-md border border-slate-700" />
+          <img
+            src={business.photoBase64}
+            alt={business.name}
+            className="max-h-60 object-contain rounded-md border border-slate-700"
+          />
         </div>
       )}
       <div className="mb-4 space-y-1 text-sm text-slate-200">
@@ -27,7 +31,9 @@ export const BusinessDetailsModal: React.FC<BusinessDetailsModalProps> = ({ isOp
           <p><strong>Coordinate:</strong> {business.latitude}, {business.longitude}</p>
         )}
       </div>
-      <h3 className="text-lg font-semibold text-cyan-400 mb-2">Anomalie Segnalate ({anomalies.length})</h3>
+      <h3 className="text-lg font-semibold text-cyan-400 mb-2">
+        Anomalie Segnalate ({anomalies.length})
+      </h3>
       <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
         {anomalies.length > 0 ? (
           anomalies.map(anomaly => (

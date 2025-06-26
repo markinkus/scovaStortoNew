@@ -17,7 +17,7 @@
     "jsx": "react-jsx",
     "types": ["vite/client", "react"],
   },
-  "include": ["src"],
+  "include": ["src", "../components/icons/InfoCircleIcon.tsx"],
   "exclude": ["node_modules", "dist", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
