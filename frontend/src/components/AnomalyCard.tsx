@@ -4,7 +4,8 @@ import { Card, CardContent, Typography, CardMedia, Box } from '@mui/material';
 interface Anomaly {
   id: number;
   description: string;
-  photo_url?: string | null;
+  receipt_photo_base64?: string | null;
+  anomaly_photo_base64s?: string[] | null;
   reportedBy?: { id: number; username: string };
   business?: { id: number; name: string; address: string };
   createdAt: string; // Assuming ISO string date
@@ -17,11 +18,11 @@ interface AnomalyCardProps {
 const AnomalyCard: React.FC<AnomalyCardProps> = ({ anomaly }) => {
   return (
     <Card sx={{ mb: 2 }}>
-      {anomaly.photo_url && (
+      {anomaly.receipt_photo_base64 && (
         <CardMedia
           component="img"
           height="140"
-          image={anomaly.photo_url} // Use actual photo_url
+          image={anomaly.receipt_photo_base64}
           alt={`Anomaly at ${anomaly.business?.name || 'N/A'}`}
           sx={{ objectFit: 'cover' }}
         />
