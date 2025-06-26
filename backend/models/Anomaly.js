@@ -14,7 +14,7 @@ const Anomaly = sequelize.define('Anomaly', {
   // Base64 version of the receipt photo
   receipt_photo_base64: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   // Array of Base64 images for additional anomaly photos
   anomaly_photo_base64s: {
