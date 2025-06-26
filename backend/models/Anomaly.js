@@ -11,12 +11,14 @@ const Anomaly = sequelize.define('Anomaly', {
     type: DataTypes.TEXT,
     allowNull: false
   },
-  receipt_photo_url: {
-    type: DataTypes.STRING,
+  // Base64 version of the receipt photo
+  receipt_photo_base64: {
+    type: DataTypes.TEXT,
     allowNull: false
   },
-  anomaly_photo_urls: {
-    type: DataTypes.JSON, // Store as JSON array of strings
+  // Array of Base64 images for additional anomaly photos
+  anomaly_photo_base64s: {
+    type: DataTypes.JSON,
     allowNull: true
   },
   ocr_business_name: {

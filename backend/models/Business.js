@@ -27,9 +27,10 @@ const Business = sequelize.define('Business', {
     type: DataTypes.STRING,
     allowNull: true // Optional VAT number
   },
-  photo_url: {
-    type: DataTypes.STRING,
-    allowNull: true // Optional URL or path to the shop photo
+  // Store business photo directly as Base64 to simplify image handling
+  photo_base64: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   timestamps: true

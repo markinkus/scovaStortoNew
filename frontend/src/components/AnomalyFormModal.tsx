@@ -301,30 +301,19 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({ open, onClose, busi
 
     setSubmitting(true);
     try {
-      const data = new FormData();
-      data.append('businessId', String(businessId)); // Ensure businessId is string
-      data.append('description', description);
+      const payload = {
+        businessId,
+        description,
+        receiptPhotoBase64: receiptFile ? await convertFileToBase64(receiptFile) : '',
+        anomalyPhotoBase64s: await Promise.all(anomalyPhotos.map(f => convertFileToBase64(f))),
+        ocr_business_name: formOcrNomeEsercizio,
+        ocr_p_iva: formOcrPiva,
+        ocr_address: formOcrIndirizzo,
+        ocr_date: formOcrData,
+        ocr_total_amount: formOcrImporto,
+      };
 
-      // Append OCR data
-      data.append('ocr_business_name', formOcrNomeEsercizio);
-      data.append('ocr_p_iva', formOcrPiva);
-      data.append('ocr_address', formOcrIndirizzo);
-      data.append('ocr_date', formOcrData);
-      data.append('ocr_total_amount', formOcrImporto);
-
-      // Append receipt photo
-      if (receiptFile) {
-        data.append('receiptPhoto', receiptFile);
-      }
-
-      // Append anomaly photos
-      if (anomalyPhotos && anomalyPhotos.length > 0) {
-        anomalyPhotos.forEach(photo => {
-          data.append('anomalyPhotos', photo);
-        });
-      }
-      
-      const newAnomaly = await post<any>('/anomalies', data);
+      const newAnomaly = await post<any>('/anomalies', payload);
       onAnomalyReported(newAnomaly);
       handleClose(); // Close and reset form on success
 

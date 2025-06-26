@@ -15,6 +15,15 @@ import {
   Typography
 } from '@mui/material';
 
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+};
+
 interface AddBusinessModalProps {
   open: boolean;
   onClose: () => void;
@@ -28,6 +37,7 @@ interface BusinessFormData {
   longitude: string; // Keep as string for input, convert on submit
   p_iva: string; // New field for VAT number
   photo: File | null; // New field for store photo
+  photoBase64: string | null;
 }
 
 const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBusinessAdded }) => {
@@ -37,7 +47,8 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
     latitude: '',
     longitude: '',
     p_iva: '', // Initialize p_iva
-    photo: null, // Initialize photo
+    photo: null,
+    photoBase64: null,
   });
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null); // For geocoding success
@@ -58,16 +69,24 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setFormData({
-        ...formData,
-        photo: event.target.files[0],
-      });
+      const file = event.target.files[0];
+      try {
+        const b64 = await fileToBase64(file);
+        setFormData({
+          ...formData,
+          photo: file,
+          photoBase64: b64,
+        });
+      } catch (err) {
+        setError('Errore lettura file.');
+      }
     } else {
       setFormData({
         ...formData,
         photo: null,
+        photoBase64: null,
       });
     }
   };
@@ -98,27 +117,19 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
 
     setSubmitting(true);
     try {
-      const data = new FormData();
-      data.append('name', formData.name);
-      data.append('address', formData.address);
-      data.append('latitude', formData.latitude); // Send as string
-      data.append('longitude', formData.longitude); // Send as string
+      const payload = {
+        name: formData.name,
+        address: formData.address,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        p_iva: formData.p_iva || undefined,
+        photoBase64: formData.photoBase64 || undefined,
+      };
 
-      if (formData.p_iva) {
-        data.append('p_iva', formData.p_iva);
-      }
-
-      if (formData.photo) {
-        data.append('shopPhoto', formData.photo);
-        console.log('Appending photo to FormData:', formData.photo.name);
-      }
-
-      // console.log("Submitting FormData..."); // Optional: for debugging
-
-      const newBusiness = await post<any>('/businesses', data); // Send FormData
+      const newBusiness = await post<any>('/businesses', payload);
       onBusinessAdded(newBusiness); // Pass the new business data to the parent
       // Reset form specific fields within handleSubmit before calling generic handleClose
-      setFormData({ name: '', address: '', latitude: '', longitude: '', p_iva: '', photo: null });
+      setFormData({ name: '', address: '', latitude: '', longitude: '', p_iva: '', photo: null, photoBase64: null });
       setError(null);
       onClose(); // Call original onClose from props
     } catch (err: any) {
@@ -143,6 +154,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
       longitude: '',
       p_iva: '',
       photo: null,
+      photoBase64: null,
     });
     setError(null);
     setSuccessMessage(null); // Also clear success message on close

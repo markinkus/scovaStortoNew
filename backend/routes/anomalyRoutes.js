@@ -1,51 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+// Images will be sent as Base64 strings so we don't need multer
 const User = require('../models/User');
 const Business = require('../models/Business');
 const Anomaly = require('../models/Anomaly');
 const authMiddleware = require('../middleware/authMiddleware');
 const { Sequelize } = require('sequelize'); // For potential use in complex queries
 
-// Configure multer for anomaly file uploads
-const anomalyUploadDir = path.join(__dirname, '..', 'uploads', 'anomaly_files');
-
-if (!fs.existsSync(anomalyUploadDir)) {
-  fs.mkdirSync(anomalyUploadDir, { recursive: true });
-}
-
-const anomalyStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, anomalyUploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname.replace(/\s/g, '_'));
-  }
-});
-
-const anomalyUpload = multer({
-  storage: anomalyStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
-  fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Sono permesse solo immagini!'), false);
-    }
-  }
-});
 
 // POST /api/anomalies - Report a new anomaly
-router.post('/', authMiddleware, anomalyUpload.fields([
-  { name: 'receiptPhoto', maxCount: 1 },
-  { name: 'anomalyPhotos', maxCount: 5 }
-]), async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const {
       description,
       businessId,
+      receiptPhotoBase64,
+      anomalyPhotoBase64s,
       ocr_business_name,
       ocr_p_iva,
       ocr_address,
@@ -66,7 +36,7 @@ router.post('/', authMiddleware, anomalyUpload.fields([
         return res.status(400).json({ message: 'businessId must be a valid number.' });
     }
 
-    if (!req.files || !req.files.receiptPhoto || !req.files.receiptPhoto[0]) {
+    if (!receiptPhotoBase64) {
       return res.status(400).json({ message: 'Receipt photo is required.' });
     }
 
@@ -76,10 +46,10 @@ router.post('/', authMiddleware, anomalyUpload.fields([
       return res.status(404).json({ message: 'Business not found with the provided businessId.' });
     }
 
-    const receipt_photo_url = `/uploads/anomaly_files/${req.files.receiptPhoto[0].filename}`;
-    let anomaly_photo_urls = null;
-    if (req.files.anomalyPhotos && req.files.anomalyPhotos.length > 0) {
-      anomaly_photo_urls = req.files.anomalyPhotos.map(file => `/uploads/anomaly_files/${file.filename}`);
+    const receipt_photo_base64 = receiptPhotoBase64;
+    let anomaly_photo_base64s = null;
+    if (Array.isArray(anomalyPhotoBase64s) && anomalyPhotoBase64s.length > 0) {
+      anomaly_photo_base64s = anomalyPhotoBase64s;
     }
 
     // 3. Create new anomaly
@@ -87,8 +57,8 @@ router.post('/', authMiddleware, anomalyUpload.fields([
       description,
       businessId: parsedBusinessId,
       reportedBy: req.user.id,
-      receipt_photo_url,
-      anomaly_photo_urls,
+      receipt_photo_base64,
+      anomaly_photo_base64s,
       ocr_business_name,
       ocr_p_iva,
       ocr_address,
@@ -222,21 +192,21 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Forbidden. You do not have permission to update this anomaly.' });
     }
 
-    const { description, photo_url } = req.body;
+    const { description, receiptPhotoBase64, anomalyPhotoBase64s } = req.body;
 
     // Validate input: description should not be empty if provided
     if (description !== undefined && description.trim() === '') {
         return res.status(400).json({ message: 'Description cannot be empty.' });
     }
-    if (photo_url !== undefined && typeof photo_url !== 'string') { // photo_url can be set to empty string or null
-        return res.status(400).json({ message: 'photo_url must be a string.' });
+    if (receiptPhotoBase64 !== undefined && typeof receiptPhotoBase64 !== 'string') {
+        return res.status(400).json({ message: 'receiptPhotoBase64 must be a string.' });
     }
 
 
     // Update only provided fields
     if (description !== undefined) anomaly.description = description;
-    // Allow setting photo_url to null or an empty string to remove it
-    if (photo_url !== undefined) anomaly.photo_url = photo_url === "" ? null : photo_url;
+    if (receiptPhotoBase64 !== undefined) anomaly.receipt_photo_base64 = receiptPhotoBase64 === "" ? null : receiptPhotoBase64;
+    if (anomalyPhotoBase64s !== undefined) anomaly.anomaly_photo_base64s = Array.isArray(anomalyPhotoBase64s) ? anomalyPhotoBase64s : null;
 
 
     await anomaly.save();

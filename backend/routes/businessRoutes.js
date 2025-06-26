@@ -1,51 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer'); // For handling file uploads
-const path = require('path'); // For manipulating file paths
-const fs = require('fs'); // For file system operations, like creating directories
+// Image data will be sent as Base64 strings, no file uploads needed
 const User = require('../models/User');
 const Business = require('../models/Business');
 const Anomaly = require('../models/Anomaly');
 const authMiddleware = require('../middleware/authMiddleware');
 const { Sequelize } = require('sequelize'); // Import Sequelize
 
-// Configure multer for file uploads
-const uploadDir = path.join(__dirname, '..', 'uploads', 'shop_photos');
-
-// Ensure the upload directory exists
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Use a timestamp and the original extension to create a unique filename
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-  fileFilter: function (req, file, cb) {
-    // Allow only image files
-    const filetypes = /jpeg|jpg|png|gif/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname) {
-      return cb(null, true);
-    }
-    cb(new Error('Error: File upload only supports the following filetypes - ' + filetypes));
-  }
-});
 
 // POST /api/businesses - Create a new business
-router.post('/', authMiddleware, upload.single('shopPhoto'), async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { name, address, latitude, longitude, p_iva } = req.body; // Include p_iva
+    const { name, address, latitude, longitude, p_iva, photoBase64 } = req.body;
 
     // Validate input
     if (!name || !address || !latitude || !longitude) {
@@ -59,19 +25,15 @@ router.post('/', authMiddleware, upload.single('shopPhoto'), async (req, res) =>
       return res.status(400).json({ message: 'Latitude and longitude must be valid numbers.' });
     }
 
-    let photo_url = null;
-    if (req.file) {
-      // Construct the URL path for the photo. Assumes 'uploads' is served statically.
-      photo_url = `/uploads/shop_photos/${req.file.filename}`;
-    }
+    const photo_base64 = photoBase64 || null;
 
     const newBusiness = await Business.create({
       name,
       address,
       latitude: lat, // Use parsed latitude
       longitude: lon, // Use parsed longitude
-      p_iva, // Add p_iva
-      photo_url, // Add photo_url
+      p_iva,
+      photo_base64,
       addedBy: req.user.id // From authMiddleware
     });
 
@@ -184,7 +146,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Forbidden. You do not have permission to update this business.' });
     }
 
-    const { name, address, latitude, longitude } = req.body;
+    const { name, address, latitude, longitude, photoBase64 } = req.body;
 
     // Basic validation for provided fields
     if (name !== undefined && !name.trim()) return res.status(400).json({ message: 'Name cannot be empty.' });
@@ -198,6 +160,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (address !== undefined) business.address = address;
     if (latitude !== undefined) business.latitude = latitude;
     if (longitude !== undefined) business.longitude = longitude;
+    if (photoBase64 !== undefined) business.photo_base64 = photoBase64;
 
     await business.save();
 

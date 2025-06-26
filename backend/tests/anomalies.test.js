@@ -75,7 +75,7 @@ describe('Anomaly API Endpoints', () => {
         .send({
           description: 'Test anomaly description',
           businessId: testBusinessId,
-          photo_url: 'http://example.com/photo.jpg',
+          receiptPhotoBase64: 'data:image/png;base64,TEST',
         });
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty('description', 'Test anomaly description');
@@ -134,7 +134,7 @@ describe('Anomaly API Endpoints', () => {
         description: 'Detailed Anomaly',
         businessId: testBusinessId,
         reportedBy: testUserId,
-        photo_url: 'http://example.com/detailed.jpg'
+        receipt_photo_base64: 'data:image/png;base64,TEST'
       });
 
       const res = await request(app).get('/api/anomalies');
@@ -147,10 +147,11 @@ describe('Anomaly API Endpoints', () => {
     });
 
     it('should filter anomalies by businessId if provided', async () => {
-       await Anomaly.create({
+      await Anomaly.create({
         description: 'Anomaly for specific business',
         businessId: testBusinessId,
         reportedBy: testUserId,
+        receipt_photo_base64: 'data:image/png;base64,TEST'
       });
       // Create another business and anomaly to ensure filtering works
       const otherBusinessRes = await request(app)
@@ -161,6 +162,7 @@ describe('Anomaly API Endpoints', () => {
         description: 'Anomaly for other business',
         businessId: otherBusinessRes.body.id,
         reportedBy: testUserId,
+        receipt_photo_base64: 'data:image/png;base64,TEST'
       });
 
       const res = await request(app).get(`/api/anomalies?businessId=${testBusinessId}`);
