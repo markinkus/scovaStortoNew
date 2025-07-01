@@ -1,3 +1,4 @@
+// frontend/src/App.tsx
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
@@ -64,33 +65,42 @@ function App() {
           <Route
             path="/"
             element={
-              <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
-                {/* Lista attività */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' }, // colonna su xs, riga da sm in su
+                  flexGrow: 1,
+                  overflow: 'hidden',
+                }}
+              >
+                {/* ─── LISTA ATTIVITÀ ─── */}
                 <Box
                   sx={{
                     width: { xs: '100%', sm: '30%', md: '25%' },
                     overflowY: 'auto',
-                    borderRight: 1,
-                    borderColor: 'divider'
+                    borderRight: { xs: 0, sm: 1 },
+                    borderColor: 'divider',
                   }}
                 >
                   <BusinessMenu
                     businesses={businesses}
                     selectedBusiness={selectedBusiness}
-                    // Solo selezione
-                    onSelectBusiness={(b) => setSelectedBusiness(b)}
+                    onSelectBusiness={b => setSelectedBusiness(b)}
                   />
                 </Box>
 
-                {/* Mappa */}
-                <Box sx={{ flexGrow: 1, height: '100%' }}>
+                {/* ─── MAPPA ─── */}
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    height: { xs: '50vh', sm: '100%' } // mappa 50vh su xs, full su sm+
+                  }}
+                >
                   <BusinessMap
                     onBusinessesLoaded={setBusinesses}
                     selectedBusiness={selectedBusiness}
-                    // Solo selezione
-                    onSelectBusiness={(b) => setSelectedBusiness(b)}
-                    // Solo apertura dettagli
-                    onOpenDetails={(b: Business) => {
+                    onSelectBusiness={b => setSelectedBusiness(b)}
+                    onOpenDetails={b => {
                       setSelectedBusiness(b);
                       setInfoOpen(true);
                     }}

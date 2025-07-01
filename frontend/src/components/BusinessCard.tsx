@@ -1,7 +1,16 @@
+// src/components/BusinessCard.tsx
 import React from 'react';
-import { Card, CardContent, Typography, Box, Chip, Button } from '@mui/material';
-import { MapPinIcon } from '../../../components/icons/MapPinIcon';
-import { InfoCircleIcon } from '../../../components/icons/InfoCircleIcon';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Chip,
+  Button,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info'; // or your InfoCircleIcon
 
 interface Business {
   id: number;
@@ -19,42 +28,90 @@ interface BusinessCardProps {
   onOpenDetails: (businessId: number) => void;
 }
 
-const BusinessCard: React.FC<BusinessCardProps> = ({ business, onSelectBusiness, onOpenDetails }) => {
+const BusinessCard: React.FC<BusinessCardProps> = ({
+  business,
+  onSelectBusiness,
+  onOpenDetails
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Card
-      sx={{ mb: 2, cursor: 'pointer' }}
       onClick={() => onSelectBusiness(business.id)}
+      sx={{
+        mb: isMobile ? 1 : 2,
+        cursor: 'pointer',
+        p: isMobile ? 1 : 2
+      }}
     >
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
-            <Typography variant="h6" component="div">
+      <CardContent sx={{ p: 0 }}>
+        <Box
+          display="flex"
+          flexDirection={isMobile ? 'column' : 'row'}
+          justifyContent="space-between"
+          alignItems={isMobile ? 'stretch' : 'center'}
+        >
+          {/* Info */}
+          <Box flexGrow={1}>
+            <Typography
+              variant={isMobile ? 'subtitle1' : 'h6'}
+              noWrap
+            >
               {business.name}
             </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: isMobile ? 1 : 1.5 }}
+              noWrap
+            >
               {business.address}
             </Typography>
-            <Typography variant="body2">
-              Coordinates: ({business.latitude.toFixed(4)}, {business.longitude.toFixed(4)})
-            </Typography>
+            {!isMobile && (
+              <Typography variant="caption" color="text.secondary">
+                Coords: ({business.latitude.toFixed(4)}, {business.longitude.toFixed(4)})
+              </Typography>
+            )}
             {business.addedByUser && (
-              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                display="block"
+                sx={{ mt: isMobile ? 0.5 : 1 }}
+              >
                 Added by: {business.addedByUser.username}
               </Typography>
             )}
             {business.anomalyCount !== undefined && (
-              <Chip label={`Anomalies: ${business.anomalyCount}`} size="small" sx={{ mt: 1 }} />
+              <Chip
+                label={`Anomalies: ${business.anomalyCount}`}
+                size="small"
+                sx={{ mt: isMobile ? 0.5 : 1 }}
+              />
             )}
           </Box>
-          <Button
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenDetails(business.id);
+
+          {/* Details button */}
+          <Box
+            sx={{
+              mt: isMobile ? 1 : 0,
+              ml: isMobile ? 0 : 2,
+              width: isMobile ? '100%' : 'auto'
             }}
           >
-            <InfoCircleIcon />
-          </Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenDetails(business.id);
+              }}
+              fullWidth={isMobile}
+              size={isMobile ? 'small' : 'medium'}
+              variant="outlined"
+              startIcon={<InfoIcon fontSize={isMobile ? 'small' : 'medium'} />}
+            >
+              {isMobile ? 'Dettagli' : ''}
+            </Button>
+          </Box>
         </Box>
       </CardContent>
     </Card>
