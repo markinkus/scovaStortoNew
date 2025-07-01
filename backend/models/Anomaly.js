@@ -17,9 +17,22 @@ const Anomaly = sequelize.define('Anomaly', {
     allowNull: true
   },
   // Array of Base64 images for additional anomaly photos
+ // Array di Base64 images per le foto aggiuntive
   anomaly_photo_base64s: {
-    type: DataTypes.JSON,
-    allowNull: true
+    type: DataTypes.TEXT,
+    allowNull: true,
+    get() {
+      const raw = this.getDataValue('anomaly_photo_base64s');
+      try {
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    },
+    set(val) {
+      // al salvataggio serializziamo sempre in stringa
+      this.setDataValue('anomaly_photo_base64s', JSON.stringify(val || []));
+    }
   },
   ocr_business_name: {
     type: DataTypes.STRING,

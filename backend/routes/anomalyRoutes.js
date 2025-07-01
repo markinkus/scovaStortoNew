@@ -51,14 +51,14 @@ router.post('/', authMiddleware, async (req, res) => {
     if (Array.isArray(anomalyPhotoBase64s) && anomalyPhotoBase64s.length > 0) {
       anomaly_photo_base64s = anomalyPhotoBase64s;
     }
-
+    const anomalyArray = Array.isArray(anomalyPhotoBase64s) ? anomalyPhotoBase64s : [];
     // 3. Create new anomaly
     const newAnomaly = await Anomaly.create({
       description,
       businessId: parsedBusinessId,
       reportedBy: req.user.id,
       receipt_photo_base64,
-      anomaly_photo_base64s,
+      anomaly_photo_base64s: anomalyArray,
       ocr_business_name,
       ocr_p_iva,
       ocr_address,
