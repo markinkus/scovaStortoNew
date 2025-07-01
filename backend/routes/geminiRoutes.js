@@ -3,7 +3,7 @@ const router = express.Router();
 const { GoogleGenAI } = require('@google/genai');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL_TEXT = process.env.GEMINI_MODEL_TEXT || 'gemini-2.5-flash-preview-04-17';
+const GEMINI_MODEL_TEXT = process.env.GEMINI_MODEL_TEXT || 'gemini-2.5-pro';
 
 let ai = null;
 if (GEMINI_API_KEY) {
@@ -16,6 +16,56 @@ if (GEMINI_API_KEY) {
 
 router.get('/check', (req, res) => {
   res.json({ configured: !!ai });
+});
+router.post('/describe', async (req, res) => {
+  if (!ai) return res.status(500).json({ error: 'Gemini non configurata' });
+
+  const { businessName, ocrData, anomalyPhotoBase64s } = req.body;
+  if (!businessName || !ocrData || !Array.isArray(anomalyPhotoBase64s)) {
+    return res.status(400).json({ error: 'Parametri mancanti o formattati male' });
+  }
+
+  // 1) Prompt testuale
+  const prompt = `
+Sei un esperto analizzatore di cibo. Ricevi alcune foto di anomalie trovate in un'attività e
+i dati OCR del relativo scontrino. Crea **solo** un paragrafo in italiano che descriva chiaramente
+le anomalie visibili nelle foto (es. “la fetta è bruciata in un angolo”, “cobertura screpolata”, “porzione troppo piccola”, ecc.).
+Non aggiungere nulla che non sia la descrizione, niente virgolette, niente dettagli tecnici.  
+Attività: ${businessName}  
+Dati OCR: ${JSON.stringify(ocrData)}
+`.trim();
+
+  // 2) Costruisci i parts: prompt + inlineData per ciascuna foto
+  const parts = [{ text: prompt }];
+  anomalyPhotoBase64s.forEach(b64 => {
+    const m = b64.match(/^data:(image\/[\w+.-]+);base64,(.*)$/);
+    if (!m) return;
+    parts.push({
+      inlineData: {
+        mimeType: m[1],
+        data:      m[2],
+      }
+    });
+  });
+
+  try {
+    const response = await ai.models.generateContent({
+      model: GEMINI_MODEL_TEXT,
+      contents: [{ parts }],
+      config: {
+        temperature: 0.2,
+        // chiediamo esplicitamente testo semplice
+        responseMimeType: 'text/plain',
+      },
+    });
+
+    // Estrai il testo semplice
+    const description = response.text.trim();
+    return res.json({ description });
+  } catch (err) {
+    console.error('Errore Gemini describe:', err);
+    return res.status(500).json({ error: err.message || 'Errore AI' });
+  }
 });
 
 router.post('/extract', async (req, res) => {
