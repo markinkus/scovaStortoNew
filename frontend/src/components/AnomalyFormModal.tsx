@@ -193,34 +193,28 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
   }, [ocrInProgress, selectedBusinessDetails, formOcrNome, formOcrPiva, formOcrIndirizzo]);
 
   // — Manual AI description generator
-  const handleGenerateDescription = async () => {
-    if (!ocrData || !selectedBusinessDetails) return;
-    setAiDescError(null);
-    setAiDescInProgress(true);
+const handleGenerateDescription = async () => {
+  if (!ocrData || !selectedBusinessDetails) return;
+  setAiDescError(null);
+  setAiDescInProgress(true);
 
-    try {
-      // prepara le immagini
-      const photosB64 = await Promise.all(
-        anomalyPhotos.map(f => convertFileToBase64(f))
-      );
-      const text = await generateAnomalyDescription(
-        selectedBusinessDetails.name,
-        {
-          nome_esercizio:      ocrData.nome_esercizio,
-          p_iva:               ocrData.p_iva,
-          indirizzo_esercizio: ocrData.indirizzo_esercizio,
-          data:                ocrData.data,
-          importo_totale:      ocrData.importo_totale,
-        },
-        photosB64
-      );
-      setDescription(text);
-    } catch (e: any) {
-      setAiDescError(e.message || 'Errore generazione descrizione AI.');
-    } finally {
-      setAiDescInProgress(false);
-    }
-  };
+  try {
+    // converto le foto in base64
+    const photoBase64s = await Promise.all(
+      anomalyPhotos.map(f => convertFileToBase64(f))
+    );
+    const text = await generateAnomalyDescription(
+      selectedBusinessDetails.name,
+      ocrData,
+      photoBase64s
+    );
+    setDescription(text);
+  } catch (e: any) {
+    setAiDescError(e.message || 'Errore AI');
+  } finally {
+    setAiDescInProgress(false);
+  }
+};
 
   // — Final submit
   const handleSubmit = async (e: React.FormEvent) => {

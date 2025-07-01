@@ -17,53 +17,63 @@ if (GEMINI_API_KEY) {
 router.get('/check', (req, res) => {
   res.json({ configured: !!ai });
 });
+
+// helper per estrarre mimeType e dati puro
+function splitBase64(dataUrl) {
+  const m = dataUrl.match(/^data:(image\/[\w+.-]+);base64,(.*)$/);
+  if (!m) throw new Error('Base64 immagine malformato');
+  return { mimeType: m[1], data: m[2] };
+}
+
 router.post('/describe', async (req, res) => {
   if (!ai) return res.status(500).json({ error: 'Gemini non configurata' });
-
-  const { businessName, ocrData, anomalyPhotoBase64s } = req.body;
-  if (!businessName || !ocrData || !Array.isArray(anomalyPhotoBase64s)) {
+  const { businessName, ocrData, photoBase64s } = req.body;
+  if (
+    typeof businessName !== 'string' ||
+    typeof ocrData !== 'object'   ||
+    !Array.isArray(photoBase64s)
+  ) {
     return res.status(400).json({ error: 'Parametri mancanti o formattati male' });
   }
 
-  // 1) Prompt testuale
+  // 1) prompt testuale
   const prompt = `
-Sei un esperto analizzatore di cibo. Ricevi alcune foto di anomalie trovate in un'attività e
-i dati OCR del relativo scontrino. Crea **solo** un paragrafo in italiano che descriva chiaramente
-le anomalie visibili nelle foto (es. “la fetta è bruciata in un angolo”, “cobertura screpolata”, “porzione troppo piccola”, ecc.).
-Non aggiungere nulla che non sia la descrizione, niente virgolette, niente dettagli tecnici.  
-Attività: ${businessName}  
-Dati OCR: ${JSON.stringify(ocrData)}
-`.trim();
+Sei un analizzatore di cibo: crea in italiano una descrizione concisa e chiara delle anomalie
+evidenziate dalle immagini fornite. Usa questi dati estratti dallo scontrino (JSON):
+${JSON.stringify(ocrData)}
 
-  // 2) Costruisci i parts: prompt + inlineData per ciascuna foto
-  const parts = [{ text: prompt }];
-  anomalyPhotoBase64s.forEach(b64 => {
-    const m = b64.match(/^data:(image\/[\w+.-]+);base64,(.*)$/);
-    if (!m) return;
-    parts.push({
-      inlineData: {
-        mimeType: m[1],
-        data:      m[2],
-      }
-    });
-  });
+Attività: ${businessName}
+
+Restituisci solo la descrizione, senza virgolette o etichette aggiuntive.
+  `.trim();
+
+  // 2) componi i parti del contenuto per Gemini
+  const parts = [
+    { text: prompt }
+  ];
+
+  // 3) aggiungi inlineData per ogni foto
+  for (const b64 of photoBase64s) {
+    try {
+      const { mimeType, data } = splitBase64(b64);
+      parts.push({
+        inlineData: { mimeType, data }
+      });
+    } catch (e) {
+      // salta immagini non valide
+      console.warn('salto immagine non valida:', e);
+    }
+  }
 
   try {
     const response = await ai.models.generateContent({
       model: GEMINI_MODEL_TEXT,
       contents: [{ parts }],
-      config: {
-        temperature: 0.2,
-        // chiediamo esplicitamente testo semplice
-        responseMimeType: 'text/plain',
-      },
+      config: { temperature: 0.3 }
     });
-
-    // Estrai il testo semplice
-    const description = response.text.trim();
-    return res.json({ description });
+    return res.json({ description: response.text.trim() });
   } catch (err) {
-    console.error('Errore Gemini describe:', err);
+    console.error('Gemini describe error:', err);
     return res.status(500).json({ error: err.message || 'Errore AI' });
   }
 });
