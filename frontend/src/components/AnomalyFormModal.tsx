@@ -206,7 +206,7 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
         selectedBusinessDetails.name,
         ocrData,
         photoB64s
-      );
+      ) as any; // ← cast to match the new response type
       if (!aiRes.valid) {
         setAiDescValid(false);
         setAiDescError(aiRes.error || 'Prodotti non corrispondono.');
