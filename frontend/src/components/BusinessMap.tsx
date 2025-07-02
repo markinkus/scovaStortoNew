@@ -89,7 +89,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
           <Button
             variant="contained"
             onClick={() => setIsAddOpen(true)}
-            sx={{ position: 'absolute', top: 16, right: 16, zIndex: theme => theme.zIndex.modal - 1 }}
+            sx={{ position: 'absolute', top: '80%', right: 16, zIndex: theme => theme.zIndex.modal - 1 }}
           >
             Aggiungi Attività
           </Button>

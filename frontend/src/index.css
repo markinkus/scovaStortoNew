@@ -25,3 +25,10 @@ code {
   background: none !important;
   border: none !important;
 }
+/* in src/index.css, DOPO l'import di leaflet.css */
+
+/* src/index.css */
+.popup-on-top.leaflet-popup-content-wrapper,
+.popup-on-top.leaflet-popup-tip {
+  z-index: 1400 !important;
+}
