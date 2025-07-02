@@ -67,7 +67,7 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
       onBusinessesLoaded(data);
     } catch (e: any) {
       console.error(e);
-      setError('Failed to fetch businesses.');
+      setError('Recupero attività fallito.');
     } finally {
       setLoading(false);
     }
@@ -89,9 +89,9 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
           <Button
             variant="contained"
             onClick={() => setIsAddOpen(true)}
-            sx={{ position: 'absolute', top: 16, right: 16, zIndex: theme => theme.zIndex.modal + 1 }}
+            sx={{ position: 'absolute', top: 16, right: 16, zIndex: theme => theme.zIndex.modal - 1 }}
           >
-            Add New Business
+            Aggiungi Attività
           </Button>
           <AddBusinessModal
             open={isAddOpen}
@@ -122,11 +122,11 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
                 <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
                   {token && (
                     <Button size="small" variant="outlined" onClick={e => { e.stopPropagation(); setAnomBiz(b); setIsAnomOpen(true); }}>
-                      Report Anomaly
+                      Nuova Anomalia
                     </Button>
                   )}
                   <Button size="small" variant="outlined" onClick={e => { e.stopPropagation(); onOpenDetails(b); }}>
-                    <InfoCircleIcon /> Details
+                    <InfoCircleIcon /> Dettagli
                   </Button>
                 </Box>
               </Stack>

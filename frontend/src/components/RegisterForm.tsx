@@ -55,7 +55,7 @@ const RegisterForm: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Register
+          Registrati
         </Typography>
         {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ width: '100%', mt: 2 }}>{success}</Alert>}

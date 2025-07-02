@@ -200,10 +200,10 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add New Business</DialogTitle>
+      <DialogTitle>Aggiungi Attività</DialogTitle>
       <DialogContent>
         <DialogContentText sx={{mb: 2}}>
-          Please fill in the details for the new business. You can click on the map to pre-fill coordinates (Feature TBD).
+          Per favore, inserisci i dettagli per la nuova attività.
         </DialogContentText>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}

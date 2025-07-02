@@ -54,7 +54,7 @@ const LoginForm: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Login
+          Entra
         </Typography>
         {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
