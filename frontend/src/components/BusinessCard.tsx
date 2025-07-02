@@ -15,6 +15,7 @@ import InfoIcon from '@mui/icons-material/Info'; // or your InfoCircleIcon
 interface Business {
   id: number;
   name: string;
+  type: string; // e.g. 'ristorante', 'bar', etc.
   address: string;
   latitude: number;
   longitude: number;
@@ -59,6 +60,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({
               noWrap
             >
               {business.name}
+              {business.type}
             </Typography>
             <Typography
               variant="body2"

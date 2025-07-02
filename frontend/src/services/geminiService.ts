@@ -1,9 +1,9 @@
 import { get, post } from './api';
 import { ParsedReceiptInfo } from '../../types';
-export interface AnomalyAIResponse {
+export interface AnomalyDescriptionResponse {
   valid: boolean;
-  description?: string;
-  error?: string;
+  description: string | null;
+  error: string | null;
 }
 
 export const checkApiKey = async (): Promise<boolean> => {
@@ -67,17 +67,27 @@ export const extractTextWithGemini = async (
  * Genera automaticamente una descrizione dell'anomalia via AI.
  */
 // aggiungi un nuovo metodo che prende anche le foto
-export async function generateAnomalyDescription(
+
+export const generateAnomalyDescription = async (
   businessName: string,
   ocrData: ParsedReceiptInfo,
   photoBase64s: string[]
-): Promise<string> {
-  // chiama /describe passando le immagini
-  const res = await post<{ description: string }>('/gemini/describe', {
-    businessName,
-    ocrData,
-    photoBase64s,    // ← array di base64
-  });
-  return res.description;
-}
-
+): Promise<AnomalyDescriptionResponse> => {
+  try {
+    // POST su /gemini/describe
+    const res = await post<AnomalyDescriptionResponse>('/gemini/describe', {
+      businessName,
+      ocrData,
+      photoBase64s
+    });
+    return res;
+  } catch (err: any) {
+    console.error('Errore chiamata server describe', err);
+    // Rilancio un errore per il catch più in alto
+    throw new Error(
+      err?.response?.data?.error ||
+      err.message ||
+      'Errore generazione descrizione AI'
+    );
+  }
+};

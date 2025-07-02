@@ -4,37 +4,36 @@ import {
   Select, MenuItem, List, ListItemButton, ListItemText
 } from '@mui/material';
 import { Business } from '../App';
-
 interface BusinessMenuProps {
   businesses: Business[];
   selectedBusiness: Business | null;
-  onSelectBusiness: (business: Business) => void;
+  onSelectBusiness: (b: Business) => void;
+  filterType: string;
+  onFilterChange: (type: string) => void;
 }
 
 const BusinessMenu: React.FC<BusinessMenuProps> = ({
-  businesses, selectedBusiness, onSelectBusiness
+  businesses = [],
+  selectedBusiness,
+  onSelectBusiness,
+  filterType,
+  onFilterChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const itemRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-  // Estrai tipi unici
-  const types = Array.from(
-    new Set(businesses.map(b => b.type).filter(Boolean) as string[])
-  );
+  // Estraggo i tipi unici
+  const types = Array.from(new Set(businesses.map(b => b.type).filter(Boolean))) as string[];
 
-  // Filtra
+  // Filtro per tipo + ricerca
   const filtered = businesses
     .filter(b => filterType === 'all' || b.type === filterType)
     .filter(b => {
       const term = searchTerm.toLowerCase();
-      return (
-        b.name.toLowerCase().includes(term) ||
-        b.address.toLowerCase().includes(term)
-      );
+      return b.name.toLowerCase().includes(term) || b.address.toLowerCase().includes(term);
     });
 
-  // Scroll all’item selezionato
+  // Scrolla sull’item selezionato
   useEffect(() => {
     if (selectedBusiness) {
       const el = itemRefs.current[selectedBusiness.id];
@@ -44,23 +43,23 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({
 
   return (
     <Paper elevation={1} sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
-      <Typography variant="h6" gutterBottom>Businesses</Typography>
+      <Typography variant="h6" gutterBottom>Attività</Typography>
 
       <TextField
-        fullWidth size="small" label="Search"
+        fullWidth size="small" label="Cerca..."
         value={searchTerm}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+        onChange={e => setSearchTerm(e.target.value)}
         sx={{ mb: 2 }}
       />
 
       <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-        <InputLabel>Type</InputLabel>
+        <InputLabel>Tipo</InputLabel>
         <Select
           value={filterType}
-          label="Type"
-          onChange={(e) => setFilterType(e.target.value as string)}
+          label="Tipo"
+          onChange={e => onFilterChange(e.target.value as string)}
         >
-          <MenuItem value="all">All</MenuItem>
+          <MenuItem value="all">Tutti</MenuItem>
           {types.map(t => (
             <MenuItem key={t} value={t}>{t}</MenuItem>
           ))}
@@ -73,25 +72,25 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({
             key={b.id}
             selected={selectedBusiness?.id === b.id}
             onClick={() => onSelectBusiness(b)}
-            ref={el => {
-              itemRefs.current[b.id] = el;
-            }}
+            ref={el => { itemRefs.current[b.id] = el; }}
             sx={{
-              borderBottom: '1px solid',
+              borderBottom: 1,
               borderColor: 'divider',
               '&:hover': { backgroundColor: 'action.hover' }
             }}
           >
-            <ListItemText primary={b.name} secondary={b.address}/>
+            <ListItemText primary={b.name} secondary={b.address} />
           </ListItemButton>
         )) : (
           <ListItemButton disabled>
-            <ListItemText primary="No businesses found."/>
+            <ListItemText primary="Nessuna attività trovata." />
           </ListItemButton>
         )}
       </List>
     </Paper>
   );
 };
-
 export default BusinessMenu;
+
+
+// export default BusinessMenu;

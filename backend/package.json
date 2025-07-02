@@ -11,18 +11,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.0.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.0",
     "sequelize": "^6.37.7",
-    "sqlite3": "^5.1.7",
-    "dotenv": "^16.4.5",
-    "@google/genai": "^1.0.1"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "sequelize-cli": "^6.6.3",
     "supertest": "^7.1.1"
   }
 }

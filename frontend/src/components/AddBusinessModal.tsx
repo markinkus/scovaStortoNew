@@ -14,6 +14,9 @@ import {
   Box,
   Typography
 } from '@mui/material';
+import { BUSINESS_TYPES } from '../constants/businessTypes';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -32,6 +35,7 @@ interface AddBusinessModalProps {
 
 interface BusinessFormData {
   name: string;
+  type: string; // Use a string for the type, default to first in BUSINESS_TYPES
   address: string;
   latitude: string; // Keep as string for input, convert on submit
   longitude: string; // Keep as string for input, convert on submit
@@ -43,6 +47,7 @@ interface BusinessFormData {
 const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBusinessAdded }) => {
   const [formData, setFormData] = useState<BusinessFormData>({
     name: '',
+    type: BUSINESS_TYPES[0], // Default to first type
     address: '',
     latitude: '',
     longitude: '',
@@ -119,6 +124,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
     try {
       const payload = {
         name: formData.name,
+        type: formData.type, // Use the selected type from the dropdown
         address: formData.address,
         latitude: formData.latitude,
         longitude: formData.longitude,
@@ -129,7 +135,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
       const newBusiness = await post<any>('/businesses', payload);
       onBusinessAdded(newBusiness); // Pass the new business data to the parent
       // Reset form specific fields within handleSubmit before calling generic handleClose
-      setFormData({ name: '', address: '', latitude: '', longitude: '', p_iva: '', photo: null, photoBase64: null });
+      setFormData({ name: '', type:'', address: '', latitude: '', longitude: '', p_iva: '', photo: null, photoBase64: null });
       setError(null);
       onClose(); // Call original onClose from props
     } catch (err: any) {
@@ -149,6 +155,7 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
     // Reset form data to initial state
     setFormData({
       name: '',
+      type: BUSINESS_TYPES[0], // Reset to default type
       address: '',
       latitude: '',
       longitude: '',
@@ -222,6 +229,26 @@ const AddBusinessModal: React.FC<AddBusinessModalProps> = ({ open, onClose, onBu
             required
             disabled={submitting}
           />
+          <FormControl fullWidth margin="dense">
+           <InputLabel id="type-label">Tipo</InputLabel>
+   <Select
+     labelId="type-label"
+     id="type"
+     name="type"
+     value={formData.type}
+     label="Tipo"
+     required
+     disabled={submitting}
+     onChange={e => setFormData(prev => ({
+       ...prev,
+       type: e.target.value as string
+     }))}
+   >
+             {BUSINESS_TYPES.map(t => (
+               <MenuItem key={t} value={t}>{t}</MenuItem>
+             ))}
+           </Select>
+         </FormControl>
           <TextField
             margin="dense"
             id="address"

@@ -206,7 +206,13 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
         selectedBusinessDetails.name,
         ocrData,
         photoB64s
-      ) as any; // ← cast to match the new response type
+      ) as { valid: boolean; description: string | null; error: string | null } | null;
+      if (!aiRes || typeof aiRes.valid !== 'boolean') {
+  setAiDescError('Risposta AI non valida');
+  setAiDescValid(false);
+  setDescription('');
+  return;
+}
       if (!aiRes.valid) {
         setAiDescValid(false);
         setAiDescError(aiRes.error || 'Prodotti non corrispondono.');
@@ -356,8 +362,8 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
               onClick={handleGenerateDescription}
               disabled={
                 !receiptFile ||                // serve lo scontrino
-                anomalyPhotos.length === 0 ||   // serve almeno 1 foto
-                validationStatus !== 'success'  // deve aver passato la validazione OCR
+                anomalyPhotos.length === 0   // serve almeno 1 foto
+                // validationStatus !== 'success'  // deve aver passato la validazione OCR
               }
             >
               {aiDescInProgress

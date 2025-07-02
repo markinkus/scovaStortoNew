@@ -11,7 +11,7 @@ const { Sequelize } = require('sequelize'); // Import Sequelize
 // POST /api/businesses - Create a new business
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { name, address, latitude, longitude, p_iva, photoBase64 } = req.body;
+     const { name, address, latitude, longitude, p_iva, photoBase64, type } = req.body;
 
     // Validate input
     if (!name || !address || !latitude || !longitude) {
@@ -29,6 +29,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const newBusiness = await Business.create({
       name,
+      type,
       address,
       latitude: lat, // Use parsed latitude
       longitude: lon, // Use parsed longitude
@@ -66,9 +67,21 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 // GET /api/businesses - Get a list of all businesses
+// GET /api/businesses - Get a list of all businesses (with optional type filter)
 router.get('/', async (req, res) => {
   try {
+    // 1) Leggo il filtro dal client: ?type=bar, ?type=ristorante, ecc.
+    const typeFilter = (req.query.type) || 'all';
+
+    // 2) Costruisco il where dinamico
+    const whereClause = {};
+    if (typeFilter !== 'all') {
+      whereClause.type = typeFilter;
+    }
+
+    // 3) Lancio la query con il where e il count delle anomalie
     const businesses = await Business.findAll({
+      where: whereClause,
       include: [
         {
           model: User,
@@ -78,7 +91,7 @@ router.get('/', async (req, res) => {
         {
           model: Anomaly,
           as: 'anomalies',
-          attributes: [] // We only want the count, not the actual anomaly data here
+          attributes: []
         }
       ],
       attributes: {
@@ -86,14 +99,16 @@ router.get('/', async (req, res) => {
           [Sequelize.fn('COUNT', Sequelize.col('anomalies.id')), 'anomalyCount']
         ]
       },
-      group: ['Business.id', 'addedByUser.id'] // Group by business and the included user
+      group: ['Business.id', 'addedByUser.id']
     });
+
     res.json(businesses);
   } catch (error) {
     console.error('Error fetching businesses:', error);
     res.status(500).json({ message: 'Server error while fetching businesses.' });
   }
 });
+
 
 // GET /api/businesses/:id - Get details of a specific business
 router.get('/:id', async (req, res) => {

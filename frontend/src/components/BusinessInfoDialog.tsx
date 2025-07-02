@@ -26,6 +26,7 @@ interface Anomaly {
 interface BusinessDetails {
   id: number;
   name: string;
+  type: string; // e.g. 'ristorante', 'bar', etc.
   address: string;
   latitude?: number;
   longitude?: number;
@@ -77,6 +78,7 @@ const BusinessInfoDialog: React.FC<BusinessInfoDialogProps> = ({ businessId, ope
               />
             </Box>
             <Typography variant="h6">{details.name}</Typography>
+            <Typography variant="h6">Tipo: {details.type}</Typography>
             <Typography variant="body2" sx={{ mb: 1 }}>
               {details.address}
             </Typography>

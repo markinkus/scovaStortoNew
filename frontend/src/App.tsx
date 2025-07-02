@@ -1,4 +1,3 @@
-// frontend/src/App.tsx
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
@@ -8,6 +7,7 @@ import RegisterForm from './components/RegisterForm';
 import BusinessMap from './components/BusinessMap';
 import BusinessMenu from './components/BusinessMenu';
 import BusinessInfoDialog from './components/BusinessInfoDialog';
+import { BUSINESS_TYPES } from './constants/businessTypes';
 
 export interface Business {
   id: number;
@@ -15,7 +15,7 @@ export interface Business {
   address: string;
   latitude?: number;
   longitude?: number;
-  type?: string;
+  type: string;                         // ← adesso obbligatorio
   addedByUser?: { id: number; username: string };
   anomalyCount?: number;
   photo_base64?: string | null;
@@ -26,6 +26,7 @@ function App() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [filterType, setFilterType] = useState<string>('all');  // ← nuovissimo
 
   if (isLoading) {
     return <Typography>Loading...</Typography>;
@@ -61,19 +62,18 @@ function App() {
 
         {/* Rotte */}
         <Routes>
-          {/* Home: menu + mappa */}
           <Route
             path="/"
             element={
               <Box
                 sx={{
                   display: 'flex',
-                  flexDirection: { xs: 'column', sm: 'row' }, // colonna su xs, riga da sm in su
+                  flexDirection: { xs: 'column', sm: 'row' },
                   flexGrow: 1,
                   overflow: 'hidden',
                 }}
               >
-                {/* ─── LISTA ATTIVITÀ ─── */}
+                {/* ─── LISTA ─── */}
                 <Box
                   sx={{
                     width: { xs: '100%', sm: '30%', md: '25%' },
@@ -85,7 +85,9 @@ function App() {
                   <BusinessMenu
                     businesses={businesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={b => setSelectedBusiness(b)}
+                    onSelectBusiness={setSelectedBusiness}
+                    filterType={filterType}               // ← passo qui
+                    onFilterChange={setFilterType}         // ← e qui
                   />
                 </Box>
 
@@ -93,13 +95,13 @@ function App() {
                 <Box
                   sx={{
                     flexGrow: 1,
-                    height: { xs: '50vh', sm: '100%' } // mappa 50vh su xs, full su sm+
+                    height: { xs: '50vh', sm: '100%' }
                   }}
                 >
                   <BusinessMap
                     onBusinessesLoaded={setBusinesses}
                     selectedBusiness={selectedBusiness}
-                    onSelectBusiness={b => setSelectedBusiness(b)}
+                    onSelectBusiness={setSelectedBusiness}
                     onOpenDetails={b => {
                       setSelectedBusiness(b);
                       setInfoOpen(true);
@@ -111,22 +113,8 @@ function App() {
           />
 
           {/* Login / Register */}
-          <Route
-            path="/login"
-            element={
-              <Container sx={{ pt: 2 }}>
-                <LoginForm />
-              </Container>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <Container sx={{ pt: 2 }}>
-                <RegisterForm />
-              </Container>
-            }
-          />
+          <Route path="/login" element={<Container sx={{ pt: 2 }}><LoginForm/></Container>} />
+          <Route path="/register" element={<Container sx={{ pt: 2 }}><RegisterForm/></Container>} />
         </Routes>
 
         {/* Dialog dettagli */}
