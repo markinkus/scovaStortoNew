@@ -44,7 +44,14 @@ ${JSON.stringify(ocrData)}
 
 Attività: ${businessName}
 
-Restituisci solo la descrizione, senza virgolette o etichette aggiuntive.
+**Restituisci SEMPRE** un JSON con questa struttura:
+{
+  "valid": boolean,                // true = foto corrispondono ai prodotti, false = NO
+  "description": string | null,    // la descrizione (se valid=true)
+  "error": string | null           // il messaggio di errore (se valid=false)
+}
+
+Non includere altro, non fornire testo fuori dal JSON.
   `.trim();
 
   // 2) componi i parti del contenuto per Gemini
@@ -71,7 +78,21 @@ Restituisci solo la descrizione, senza virgolette o etichette aggiuntive.
       contents: [{ parts }],
       config: { temperature: 0.3 }
     });
-    return res.json({ description: response.text.trim() });
+   // estrai JSON puro da eventuali ```...```
+    let txt = response.text.trim();
+    const fence = txt.match(/^```(?:\w*)\s*([\s\S]*?)\s*```$/);
+    if (fence) txt = fence[1];
+
+    let aiData;
+    try {
+      aiData = JSON.parse(txt);
+    } catch (parseErr) {
+      console.error('JSON parsing fallito:', parseErr);
+      return res.status(500).json({ error: 'AI non ha restituito JSON valido' });
+    }
+
+    // ok, manda al frontend
+    return res.json(aiData);
   } catch (err) {
     console.error('Gemini describe error:', err);
     return res.status(500).json({ error: err.message || 'Errore AI' });

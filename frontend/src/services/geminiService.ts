@@ -1,5 +1,10 @@
 import { get, post } from './api';
 import { ParsedReceiptInfo } from '../../types';
+export interface AnomalyAIResponse {
+  valid: boolean;
+  description?: string;
+  error?: string;
+}
 
 export const checkApiKey = async (): Promise<boolean> => {
   try {

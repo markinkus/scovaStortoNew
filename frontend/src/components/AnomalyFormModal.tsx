@@ -37,48 +37,48 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
   open, onClose, businessId, onAnomalyReported,
 }) => {
   // — Form state
-  const [description, setDescription]     = useState<string>(''); // ← filled by AI
-  const [receiptFile, setReceiptFile]     = useState<File | null>(null);
+  const [description, setDescription] = useState<string>(''); // ← filled by AI
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [anomalyPhotos, setAnomalyPhotos] = useState<File[]>([]);
 
   // — OCR state
-  const [ocrData, setOcrData]             = useState<ParsedReceiptInfo | null>(null);
+  const [ocrData, setOcrData] = useState<ParsedReceiptInfo | null>(null);
   const [ocrInProgress, setOcrInProgress] = useState(false);
-  const [ocrError, setOcrError]           = useState<string | null>(null);
+  const [ocrError, setOcrError] = useState<string | null>(null);
 
   // — Read-only OCR fields
-  const [formOcrNome,      setFormOcrNome]      = useState('');
-  const [formOcrPiva,      setFormOcrPiva]      = useState('');
+  const [formOcrNome, setFormOcrNome] = useState('');
+  const [formOcrPiva, setFormOcrPiva] = useState('');
   const [formOcrIndirizzo, setFormOcrIndirizzo] = useState('');
-  const [formOcrData,      setFormOcrData]      = useState('');
-  const [formOcrImporto,   setFormOcrImporto]   = useState('');
+  const [formOcrData, setFormOcrData] = useState('');
+  const [formOcrImporto, setFormOcrImporto] = useState('');
 
   // — Business details
   const [selectedBusinessDetails, setSelectedBusinessDetails] = useState<BusinessDetails | null>(null);
-  const [businessFetchError,      setBusinessFetchError]      = useState<string | null>(null);
+  const [businessFetchError, setBusinessFetchError] = useState<string | null>(null);
 
   // — Validation OCR vs business
-  const [validationStatus,  setValidationStatus]  = useState<'idle'|'pending'|'success'|'error'>('idle');
-  const [validationMessage, setValidationMessage] = useState<string|null>(null);
+  const [validationStatus, setValidationStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   // — AI-description state
   const [aiDescInProgress, setAiDescInProgress] = useState(false);
-  const [aiDescError,      setAiDescError]      = useState<string|null>(null);
+  const [aiDescError, setAiDescError] = useState<string | null>(null);
 
   // — Submission & errors
-  const [error,      setError]      = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const { token } = useAuth();
   const receiptRef = useRef<HTMLInputElement>(null);
-  const photosRef  = useRef<HTMLInputElement>(null);
+  const photosRef = useRef<HTMLInputElement>(null);
 
   // — Helpers
   const convertFileToBase64 = (file: File): Promise<string> =>
     new Promise((res, rej) => {
       const r = new FileReader();
       r.readAsDataURL(file);
-      r.onload  = () => res(r.result as string);
+      r.onload = () => res(r.result as string);
       r.onerror = e => rej(e);
     });
 
@@ -117,19 +117,19 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
       setValidationMessage(null);
 
       try {
-        const b64  = await convertFileToBase64(receiptFile);
+        const b64 = await convertFileToBase64(receiptFile);
         const hint = selectedBusinessDetails?.name;
-        const res  = await extractTextWithGemini(b64, hint);
+        const res = await extractTextWithGemini(b64, hint);
         if (typeof res === 'string') {
           setOcrError(res);
         } else {
           setOcrData(res);
           // populate read-only fields
-          setFormOcrNome(res!.nome_esercizio      || '');
-          setFormOcrPiva(res!.p_iva               || '');
+          setFormOcrNome(res!.nome_esercizio || '');
+          setFormOcrPiva(res!.p_iva || '');
           setFormOcrIndirizzo(res!.indirizzo_esercizio || '');
-          setFormOcrData(res!.data                 || '');
-          setFormOcrImporto(res!.importo_totale   || '');
+          setFormOcrData(res!.data || '');
+          setFormOcrImporto(res!.importo_totale || '');
         }
       } catch (e: any) {
         setOcrError(e.message || 'Errore OCR.');
@@ -148,8 +148,8 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
 
     setValidationStatus('pending');
 
-    const nOcr  = normalize(formOcrNome);
-    const nBuz  = normalize(selectedBusinessDetails.name);
+    const nOcr = normalize(formOcrNome);
+    const nBuz = normalize(selectedBusinessDetails.name);
 
     const mName = Boolean(nOcr && nBuz && (
       nOcr.includes(nBuz) ||
@@ -166,14 +166,14 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
 
     if (mPiva) {
       ok = true;
-      msg = `OK P.IVA; nome:${mName?'OK':'NO'} indirizzo:${mAddr?'OK':'NO'}`;
+      msg = `OK P.IVA; nome:${mName ? 'OK' : 'NO'} indirizzo:${mAddr ? 'OK' : 'NO'}`;
     } else if (!selectedBusinessDetails.p_iva) {
-      ok  = mName && mAddr;
+      ok = mName && mAddr;
       msg = ok
         ? 'P.IVA mancante ma nome+indirizzo OK'
         : 'Compila manualmente i campi OCR.';
     } else {
-      msg = `P.IVA NO; nome:${mName?'OK':'NO'} indirizzo:${mAddr?'OK':'NO'}`;
+      msg = `P.IVA NO; nome:${mName ? 'OK' : 'NO'} indirizzo:${mAddr ? 'OK' : 'NO'}`;
     }
 
     setValidationStatus(ok ? 'success' : 'error');
@@ -191,30 +191,36 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
       handleValidate();
     }
   }, [ocrInProgress, selectedBusinessDetails, formOcrNome, formOcrPiva, formOcrIndirizzo]);
-
+  const [aiDescValid, setAiDescValid] = useState<boolean | null>(null)
   // — Manual AI description generator
-const handleGenerateDescription = async () => {
-  if (!ocrData || !selectedBusinessDetails) return;
-  setAiDescError(null);
-  setAiDescInProgress(true);
+  const handleGenerateDescription = async () => {
+    if (!ocrData || !selectedBusinessDetails) return;
+    setAiDescError(null);
+    setAiDescInProgress(true);
 
-  try {
-    // converto le foto in base64
-    const photoBase64s = await Promise.all(
-      anomalyPhotos.map(f => convertFileToBase64(f))
-    );
-    const text = await generateAnomalyDescription(
-      selectedBusinessDetails.name,
-      ocrData,
-      photoBase64s
-    );
-    setDescription(text);
-  } catch (e: any) {
-    setAiDescError(e.message || 'Errore AI');
-  } finally {
-    setAiDescInProgress(false);
-  }
-};
+    try {
+      const photoB64s = await Promise.all(
+        anomalyPhotos.map(f => convertFileToBase64(f))
+      );
+      const aiRes = await generateAnomalyDescription(
+        selectedBusinessDetails.name,
+        ocrData,
+        photoB64s
+      );
+      if (!aiRes.valid) {
+        setAiDescValid(false);
+        setAiDescError(aiRes.error || 'Prodotti non corrispondono.');
+        setDescription('');
+      } else {
+        setAiDescValid(true);
+        setDescription(aiRes.description || '');
+      }
+    } catch (e: any) {
+      setAiDescError(e.message || 'Errore AI');
+    } finally {
+      setAiDescInProgress(false);
+    }
+  };
 
   // — Final submit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,13 +239,13 @@ const handleGenerateDescription = async () => {
       const payload = {
         businessId,
         description,
-        receiptPhotoBase64:  await convertFileToBase64(receiptFile),
+        receiptPhotoBase64: await convertFileToBase64(receiptFile),
         anomalyPhotoBase64s: await Promise.all(anomalyPhotos.map(f => convertFileToBase64(f))),
-        ocr_business_name:  formOcrNome,
-        ocr_p_iva:          formOcrPiva,
-        ocr_address:        formOcrIndirizzo,
-        ocr_date:           formOcrData,
-        ocr_total_amount:   formOcrImporto,
+        ocr_business_name: formOcrNome,
+        ocr_p_iva: formOcrPiva,
+        ocr_address: formOcrIndirizzo,
+        ocr_date: formOcrData,
+        ocr_total_amount: formOcrImporto,
       };
       const newAnomaly = await post<any>('/anomalies', payload);
       onAnomalyReported(newAnomaly);
@@ -281,69 +287,77 @@ const handleGenerateDescription = async () => {
       </Dialog>
     );
   }
-
+  // mostrare un alert se invalid
+  {
+    aiDescValid === false && (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        I prodotti fotografati non corrispondono a quelli dello scontrino.
+      </Alert>
+    )
+  }
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle>Segnala Anomalia</DialogTitle>
       <DialogContent>
         <DialogContentText>Descrivi l’anomalia osservata</DialogContentText>
 
-        {error              && <Alert severity="error"   sx={{ mt:2 }}>{error}</Alert>}
-        {businessFetchError && <Alert severity="error"   sx={{ mt:2 }}>{businessFetchError}</Alert>}
-        {ocrError           && <Alert severity="warning" sx={{ mt:2 }}>OCR: {ocrError}</Alert>}
-        {validationMessage  && (
-          <Alert severity={validationStatus==='success'?'success':'error'} sx={{ mt:2 }}>
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {businessFetchError && <Alert severity="error" sx={{ mt: 2 }}>{businessFetchError}</Alert>}
+        {ocrError && <Alert severity="warning" sx={{ mt: 2 }}>OCR: {ocrError}</Alert>}
+        {validationMessage && (
+          <Alert severity={validationStatus === 'success' ? 'success' : 'error'} sx={{ mt: 2 }}>
             {validationMessage}
           </Alert>
         )}
-        {aiDescError        && <Alert severity="error"   sx={{ mt:2 }}>AI: {aiDescError}</Alert>}
+        {aiDescError && <Alert severity="error" sx={{ mt: 2 }}>AI: {aiDescError}</Alert>}
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt:2 }}>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
           {/* — Receipt upload & OCR — */}
           <input
             accept="image/*"
             style={{ display: 'none' }}
             id="receipt-upload"
             type="file"
-            onChange={e => setReceiptFile(e.target.files?.[0]||null)}
+            onChange={e => setReceiptFile(e.target.files?.[0] || null)}
             ref={receiptRef}
-            disabled={submitting||ocrInProgress||aiDescInProgress}
+            disabled={submitting || ocrInProgress || aiDescInProgress}
           />
           <label htmlFor="receipt-upload">
             <Button
               variant="outlined"
               component="span"
               fullWidth
-              disabled={submitting||ocrInProgress||aiDescInProgress}
+              disabled={submitting || ocrInProgress || aiDescInProgress}
             >
               Carica Scontrino
             </Button>
           </label>
-          {receiptFile && <Typography variant="body2" sx={{ mt:1 }}>{receiptFile.name}</Typography>}
+          {receiptFile && <Typography variant="body2" sx={{ mt: 1 }}>{receiptFile.name}</Typography>}
           {ocrInProgress && (
-            <Box sx={{ display:'flex', alignItems:'center', mt:1 }}>
-              <CircularProgress size={20} sx={{ mr:1 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+              <CircularProgress size={20} sx={{ mr: 1 }} />
               <Typography>OCR in corso…</Typography>
             </Box>
           )}
 
           {/* — read-only OCR fields — */}
-          <TextField label="Nome (OCR)"      fullWidth margin="dense" variant="outlined" value={formOcrNome}      InputProps={{ readOnly:true }} />
-          <TextField label="P.IVA (OCR)"     fullWidth margin="dense" variant="outlined" value={formOcrPiva}      InputProps={{ readOnly:true }} />
-          <TextField label="Indirizzo (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrIndirizzo}InputProps={{ readOnly:true }} />
-          <TextField label="Data (OCR)"      fullWidth margin="dense" variant="outlined" value={formOcrData}      InputProps={{ readOnly:true }} />
-          <TextField label="Importo (OCR)"   fullWidth margin="dense" variant="outlined" value={formOcrImporto}  InputProps={{ readOnly:true }} />
+          <TextField label="Nome (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrNome} InputProps={{ readOnly: true }} />
+          <TextField label="P.IVA (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrPiva} InputProps={{ readOnly: true }} />
+          <TextField label="Indirizzo (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrIndirizzo} InputProps={{ readOnly: true }} />
+          <TextField label="Data (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrData} InputProps={{ readOnly: true }} />
+          <TextField label="Importo (OCR)" fullWidth margin="dense" variant="outlined" value={formOcrImporto} InputProps={{ readOnly: true }} />
 
           {/* — AI description generator button — */}
-          <Box sx={{ mt:2, position:'relative' }}>
+          <Box sx={{ mt: 2, position: 'relative' }}>
             <Button
               variant="contained"
               color="info"
               fullWidth
               onClick={handleGenerateDescription}
               disabled={
-                ocrInProgress  ||
-                aiDescInProgress
+                !receiptFile ||                // serve lo scontrino
+                anomalyPhotos.length === 0 ||   // serve almeno 1 foto
+                validationStatus !== 'success'  // deve aver passato la validazione OCR
               }
             >
               {aiDescInProgress
@@ -360,27 +374,27 @@ const handleGenerateDescription = async () => {
             value={description}
             InputProps={{ readOnly: true }}
             disabled={aiDescInProgress}
-            sx={{ mt:2 }}
+            sx={{ mt: 2 }}
           />
 
           {/* — Additional photos — */}
           <input
             accept="image/*"
-            style={{ display:'none' }}
+            style={{ display: 'none' }}
             id="photos-upload"
             type="file"
             multiple
-            onChange={e => setAnomalyPhotos(Array.from(e.target.files||[]))}
+            onChange={e => setAnomalyPhotos(Array.from(e.target.files || []))}
             ref={photosRef}
-            disabled={submitting||ocrInProgress||aiDescInProgress}
+            disabled={submitting || ocrInProgress || aiDescInProgress}
           />
           <label htmlFor="photos-upload">
-            <Button variant="outlined" component="span" fullWidth disabled={submitting||ocrInProgress||aiDescInProgress} sx={{ mt:2 }}>
+            <Button variant="outlined" component="span" fullWidth disabled={submitting || ocrInProgress || aiDescInProgress} sx={{ mt: 2 }}>
               Carica Altre Foto (opzionale)
             </Button>
           </label>
           {anomalyPhotos.length > 0 && (
-            <Typography variant="body2" sx={{ mt:1 }}>
+            <Typography variant="body2" sx={{ mt: 1 }}>
               {anomalyPhotos.map(f => f.name).join(', ')}
             </Typography>
           )}
@@ -388,7 +402,7 @@ const handleGenerateDescription = async () => {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={handleClose} disabled={submitting||ocrInProgress||aiDescInProgress}>
+        <Button onClick={handleClose} disabled={submitting || ocrInProgress || aiDescInProgress}>
           Annulla
         </Button>
         <Button
@@ -398,13 +412,14 @@ const handleGenerateDescription = async () => {
             submitting ||
             ocrInProgress ||
             aiDescInProgress ||
+            aiDescValid !== true ||
             !businessId ||
             !description.trim() ||
             validationStatus !== 'success'
           }
         >
           {submitting
-            ? <CircularProgress size={24} color="inherit"/>
+            ? <CircularProgress size={24} color="inherit" />
             : 'Invia'
           }
         </Button>
