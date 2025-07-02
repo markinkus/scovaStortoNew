@@ -1,20 +1,66 @@
 # ScovaStorto Project
 
-This project allows users to report and view anomalies associated with businesses on a map. It features a React frontend built with Vite and MUI, and a Node.js/Express backend with a SQLite database.
+ScovaStorto non aiuta le attività, ma le smaschera e mette a disposizione degli utenti una mappa delle “anomalie” culinarie.
+
+---
+
+## ScovaStorto: la piattaforma per smascherare le “anomalie” culinarie
+
+### Abstract
+
+ScovaStorto è un’app web pensata per i consumatori “detective”: 
+permette di segnalare e localizzare difetti di preparazione, mancanze nel servizio, sostanze estranee negli alimenti,
+prodotti andati a male, estraendo i dati dallo scontrino per verificare la veridicità dell'acquisto
+e analizzando le foto per generare una descrizione dell'esperienza.
+
+Tutte le segnalazioni finiscono su una mappa pubblica di “anomalie” gastronomiche.
+
+---
+
+### Missione
+
+* **Esporre le malefatte**: Ogni utente può segnalare il “fuori menu” delle attività.
+* **Verifica automatica**: L’OCR sullo scontrino assicura che la foto mostri davvero ciò che hai pagato.
+* **Descrizione AI**: Un modello LLM multimodale sintetizza l’anomalia in una descrizione efficace.
+
+---
+
+**Vantaggi**:
+
+* Comunità di consumatori che “controlla” la qualità dei pasti.
+* Trasparenza: ogni segnalazione è pubblica e geolocalizzata.
+* Ridotta frode: lo scontrino certifica l’ordine reale.
+
+---
+
+### Prospettive Future
+
+* **Feed alimentare**: notifiche geolocalizzate sulle “anomalie” vicine.
+* **Badge reputazionali**: locali con badge reputazionali, i peggiori in cima al podio.
+* **Insights**: tassi di “porcheria” per zona, fascia di prezzo, tipologia di cucina.
+
+---
+
+*ScovaStorto: la bussola per orientarti tra le “anomalie” gastronomiche della tua città.*
+
+---
+---
+---
+---
 
 ## Features (Overview)
 
-*   User registration and login with JWT authentication.
-*   Users can add new businesses with their locations (latitude/longitude).
-*   Businesses are displayed on an interactive map (Leaflet).
-*   Authenticated users can report anomalies for specific businesses, optionally including a photo URL.
-*   Publicly viewable list of businesses and their reported anomalies.
-*   Users can update/delete businesses and anomalies they created.
-*   A wooden-inspired user interface with a repeating brown gradient background.
+* Registrazione e login degli utenti con autenticazione JWT.
+* Gli utenti possono aggiungere nuove attività con la loro posizione (latitudine/longitudine).
+* Le attività vengono visualizzate su una mappa interattiva (Leaflet).
+* Gli utenti autenticati possono segnalare anomalie per attività specifiche, includendo opzionalmente un URL di una foto.
+* Elenco pubblico delle attività e delle anomalie segnalate.
+* Gli utenti possono aggiornare/eliminare le attività e le anomalie che hanno creato.
+* Interfaccia utente ispirata al legno con uno sfondo a gradiente marrone ripetuto.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+Queste istruzioni ti permetteranno di ottenere una copia del progetto e di farlo funzionare sulla tua macchina locale per scopi di sviluppo e test.
 
 ### Prerequisites
 
@@ -41,18 +87,25 @@ These instructions will get you a copy of the project up and running on your loc
 
     *   Set up environment variables:
         *   Copy the example environment file:
+
             ```bash
             cp .env.example .env
             ```
-        *   Open the newly created `.env` file and replace `your_very_secret_key_replace_in_prod` with a strong, unique secret for `JWT_SECRET`. Set also your Google Gemini API key in `GEMINI_API_KEY` so OCR requests can be processed server-side.
+
+
+        *   Open the newly created `.env` file and replace `your_very_secret_key_replace_in_prod` with a strong, unique secret for `JWT_SECRET`. 
+        *   Set also your Google Gemini API key in `GEMINI_API_KEY` so OCR requests can be processed server-side.
+
             ```env
             JWT_SECRET=your_actual_strong_secret_key_here
             GEMINI_API_KEY=your_google_gemini_key
             # Optional: override default model
             GEMINI_MODEL_TEXT=gemini-2.5-flash-preview-04-17
             ```
+
+
     *   Database Synchronization:
-        *   The application uses Sequelize and is configured to automatically synchronize models with the database using `sequelize.sync({ alter: true })` when the server starts. This means tables will be created or altered as needed. The SQLite database file (`database.sqlite`) will be created in the `backend` directory.
+        *   L'applicazione utilizza `Sequelize` ed è configurata per sincronizzare automaticamente i modelli con il database usando `sequelize.sync({ alter: true })` all'avvio del server. Questo significa che le tabelle verranno create o modificate secondo necessità. Il file del database SQLite `(database.sqlite)` verrà creato nella directory backend.
     *   Start the backend server:
         ```bash
         npm start
@@ -61,10 +114,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 3.  **Frontend Setup:**
     *   Navigate to the frontend directory (from the project root):
+
         ```bash
         cd frontend
         ```
+
         (If you are in the `backend` directory, you can use `cd ../frontend`)
+        
     *   Install dependencies:
         ```bash
         npm install
@@ -76,16 +132,16 @@ These instructions will get you a copy of the project up and running on your loc
         ```bash
         npm run dev
         ```
-        The frontend development server will typically run on `http://localhost:3000` (as configured in `frontend/vite.config.ts`) or the next available port (e.g., 5173 if 3000 is taken, Vite will indicate the actual port). Open this URL in your web browser.
+        Il server di sviluppo del frontend sarà normalmente in esecuzione su `http://localhost:3000` (come configurato in vite.config.ts) oppure sulla prima porta disponibile successiva (ad esempio, 5173 se la 3000 è occupata; Vite indicherà la porta effettiva). Apri questo URL nel tuo browser web.
 
 ### Default Ports
 
 *   **Frontend (Vite)**: `http://localhost:3000` (or next available, e.g., 5173)
 *   **Backend (Node.js/Express)**: `http://localhost:3001`
 
-You should now have the ScovaStorto application running locally! You can register a new user, log in, add businesses, and report anomalies.
+Dovresti ora avere l’applicazione ScovaStorto in esecuzione in locale! Puoi registrare un nuovo utente, accedere, aggiungere attività e segnalare anomalie.
 
-# Deploy Settings
+# Railway Deploy Settings
 
 ## Build Command:
 ```bash

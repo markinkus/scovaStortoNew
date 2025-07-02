@@ -170,8 +170,8 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
     } else if (!selectedBusinessDetails.p_iva) {
       ok = mName && mAddr;
       msg = ok
-        ? 'P.IVA mancante ma nome+indirizzo OK'
-        : 'Compila manualmente i campi OCR.';
+        ? 'P.IVA mancante ma nome e indirizzo OK'
+        : 'Dati Scontrino non validi';
     } else {
       msg = `P.IVA NO; nome:${mName ? 'OK' : 'NO'} indirizzo:${mAddr ? 'OK' : 'NO'}`;
     }
