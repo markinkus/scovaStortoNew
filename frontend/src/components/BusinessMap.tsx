@@ -83,13 +83,13 @@ const BusinessMap: React.FC<BusinessMapProps> = ({
   }
 
   return (
-    <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
+    <Box sx={{ position: 'relative', height: '100dvh', width: '100%' }}>
       {token && (
         <>
           <Button
             variant="contained"
             onClick={() => setIsAddOpen(true)}
-            sx={{ position: 'absolute', top: '80%', right: 16, zIndex: theme => theme.zIndex.modal - 1 }}
+            sx={{ position: 'fixed', bottom: theme => `calc(${theme.spacing(2)} + env(safe-area-inset-bottom))`,  right: theme => theme.spacing(2), zIndex: theme => theme.zIndex.modal - 1 }}
           >
             Aggiungi Attività
           </Button>

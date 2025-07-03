@@ -20,7 +20,8 @@ router.post('/', authMiddleware, async (req, res) => {
       ocr_p_iva,
       ocr_address,
       ocr_date,
-      ocr_total_amount
+      ocr_total_amount,
+      note_utente
     } = req.body;
 
     // 1. Validate input
@@ -63,7 +64,8 @@ router.post('/', authMiddleware, async (req, res) => {
       ocr_p_iva,
       ocr_address,
       ocr_date,
-      ocr_total_amount
+      ocr_total_amount,
+      note_utente: note_utente || null // Optional user note
     });
 
     // 4. Fetch and return the created anomaly with associations
@@ -192,7 +194,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Forbidden. You do not have permission to update this anomaly.' });
     }
 
-    const { description, receiptPhotoBase64, anomalyPhotoBase64s } = req.body;
+    const { description, receiptPhotoBase64, anomalyPhotoBase64s, note_utente } = req.body;
 
     // Validate input: description should not be empty if provided
     if (description !== undefined && description.trim() === '') {
@@ -207,7 +209,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (description !== undefined) anomaly.description = description;
     if (receiptPhotoBase64 !== undefined) anomaly.receipt_photo_base64 = receiptPhotoBase64 === "" ? null : receiptPhotoBase64;
     if (anomalyPhotoBase64s !== undefined) anomaly.anomaly_photo_base64s = Array.isArray(anomalyPhotoBase64s) ? anomalyPhotoBase64s : null;
-
+    if (note_utente    !== undefined) anomaly.note_utente             = note_utente || null;
 
     await anomaly.save();
 

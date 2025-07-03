@@ -15,6 +15,7 @@ export interface Anomaly {
   id: string;
   businessId: string;
   description: string;
+  note_utente?: string | null;
   receiptImageBase64?: string; // Base64 encoded image
   otherImagesBase64: string[]; // Array of Base64 encoded images
   ocrText?: string;

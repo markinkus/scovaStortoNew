@@ -40,7 +40,7 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
   const [description, setDescription] = useState<string>(''); // ← filled by AI
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [anomalyPhotos, setAnomalyPhotos] = useState<File[]>([]);
-
+  const [userNote, setUserNote] = useState<string>('');
   // — OCR state
   const [ocrData, setOcrData] = useState<ParsedReceiptInfo | null>(null);
   const [ocrInProgress, setOcrInProgress] = useState(false);
@@ -208,11 +208,11 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
         photoB64s
       ) as { valid: boolean; description: string | null; error: string | null } | null;
       if (!aiRes || typeof aiRes.valid !== 'boolean') {
-  setAiDescError('Risposta AI non valida');
-  setAiDescValid(false);
-  setDescription('');
-  return;
-}
+        setAiDescError('Risposta AI non valida');
+        setAiDescValid(false);
+        setDescription('');
+        return;
+      }
       if (!aiRes.valid) {
         setAiDescValid(false);
         setAiDescError(aiRes.error || 'Prodotti non corrispondono.');
@@ -245,6 +245,7 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
       const payload = {
         businessId,
         description,
+        note_utente: userNote || null,
         receiptPhotoBase64: await convertFileToBase64(receiptFile),
         anomalyPhotoBase64s: await Promise.all(anomalyPhotos.map(f => convertFileToBase64(f))),
         ocr_business_name: formOcrNome,
@@ -361,9 +362,9 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
               fullWidth
               onClick={handleGenerateDescription}
               disabled={
-                !receiptFile ||                // serve lo scontrino
-                anomalyPhotos.length === 0   // serve almeno 1 foto
-                // validationStatus !== 'success'  // deve aver passato la validazione OCR
+                !receiptFile               // serve lo scontrino
+                || anomalyPhotos.length === 0   // serve almeno 1 foto
+                || validationStatus !== 'success'  // deve aver passato la validazione OCR
               }
             >
               {aiDescInProgress
@@ -380,6 +381,20 @@ const AnomalyFormModal: React.FC<AnomalyFormModalProps> = ({
             value={description}
             InputProps={{ readOnly: true }}
             disabled={aiDescInProgress}
+            sx={{ mt: 2 }}
+          />
+
+          <TextField
+            margin="dense"
+            label="Note Utente (opzionale)"
+            type="text"
+            fullWidth
+            multiline
+            rows={2}
+            variant="outlined"
+            value={userNote}
+            onChange={e => setUserNote(e.target.value)}
+            disabled={submitting || ocrInProgress || aiDescInProgress}
             sx={{ mt: 2 }}
           />
 

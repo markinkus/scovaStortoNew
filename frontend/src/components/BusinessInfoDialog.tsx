@@ -12,6 +12,7 @@ interface BusinessInfoDialogProps {
 interface Anomaly {
   id: number;
   description: string;
+  note_utente?: string | null;
   receipt_photo_base64?: string | null;
   anomaly_photo_base64s?: string[] | null;
   ocr_business_name?: string | null;

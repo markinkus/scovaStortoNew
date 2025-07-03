@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 interface Anomaly {
   id: number;
   description: string;
+  note_utente?: string | null;
   receipt_photo_base64?: string | null;
   anomaly_photo_base64s?: string[] | null;
   ocr_business_name?: string | null;
@@ -67,6 +68,13 @@ const AnomalyCard: React.FC<AnomalyCardProps> = ({ anomaly }) => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
             {anomaly.description}
           </Typography>
+          {anomaly.note_utente && (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <strong>Nota utente:</strong> {anomaly.note_utente}
+            </Typography>
+          )}
+
+          {/* Dati OCR */}
 
           {/* Dati business / utente */}
           {anomaly.business && (
