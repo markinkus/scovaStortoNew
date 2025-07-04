@@ -63,7 +63,7 @@ const LoginForm: React.FC = () => {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Indirizzo email"
             name="email"
             autoComplete="email"
             autoFocus

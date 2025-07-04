@@ -19,7 +19,7 @@ export interface Business {
   addedByUser?: { id: number; username: string };
   anomalyCount?: number;
   photo_base64?: string | null;
-  p_iva: string; // ← aggiunto p_iva come obbligatorio
+  p_iva?: string | null; // Partita IVA, opzionale
 }
 
 function App() {

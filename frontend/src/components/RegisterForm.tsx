@@ -65,7 +65,7 @@ const RegisterForm: React.FC = () => {
             required
             fullWidth
             id="username"
-            label="Username"
+            label="Username (Attento viene mostrato sulle anomalie)"
             name="username"
             autoComplete="username"
             autoFocus
@@ -77,7 +77,7 @@ const RegisterForm: React.FC = () => {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Indirizzo email"
             name="email"
             autoComplete="email"
             value={email}

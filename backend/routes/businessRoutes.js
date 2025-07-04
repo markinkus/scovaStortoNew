@@ -56,13 +56,13 @@ router.post('/', authMiddleware, async (req, res) => {
     } else if (error.name && error.name.startsWith('Sequelize')) {
       // Handle other Sequelize-specific errors
       const status = error.name === 'SequelizeUniqueConstraintError' ? 409 : 400;
+      // se codice status === 409 mettiamo come message: 'Attività già esistente con questi dati.'
+      const messageError = error.name === 'SequelizeUniqueConstraintError' ? 'Attività già esistente con questi dati.' : 'Errore di validazione';
       return res.status(status).json({
-        message: 'Database error: ' + error.message,
+        message: 'Attenzione: ' + messageError,
         type: error.name,
         errors: error.errors ? error.errors.map(e => e.message) : []
       });
-    } else if (err.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({ message: 'Attività già esistente con questi dati.' });
     }
     res.status(500).json({ message: 'Errore interno' });
   }

@@ -32,7 +32,7 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({
       const term = searchTerm.toLowerCase();
       return b.name.toLowerCase().includes(term) 
       || b.address.toLowerCase().includes(term)
-      || b.p_iva.toLowerCase().includes(term);
+      || (b.p_iva ?? '').toLowerCase().includes(term);
     });
 
   // Scrolla sull’item selezionato
