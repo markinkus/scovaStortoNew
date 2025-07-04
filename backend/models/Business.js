@@ -14,7 +14,7 @@ const Business = sequelize.define('Business', {
   type: {
     type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: 'ristorante' // Default type, can be 'all' or any other type
+    defaultValue: 'Ristorante' // Default type, can be 'all' or any other type
   },
   address: {
     type: DataTypes.STRING,

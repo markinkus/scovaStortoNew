@@ -2,7 +2,7 @@
 export interface Business {
   id: string;
   name: string;
-  type: 'Ristorante' | 'Albergo' | 'Pizzeria' | 'Bar' | 'Negozio';
+  type: 'Ristorante' | 'Albergo' | 'Pizzeria' | 'Bar' | 'Negozio' | 'Supermercato' | 'Macelleria';
   address: string;
   location: string; // e.g., "Roma", "Milano"
   piva?: string; // Partita IVA
