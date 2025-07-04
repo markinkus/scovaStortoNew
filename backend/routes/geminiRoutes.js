@@ -3,14 +3,15 @@ const router = express.Router();
 const { GoogleGenAI } = require('@google/genai');
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL_TEXT = process.env.GEMINI_MODEL_TEXT || 'gemini-2.5-pro';
+const GEMINI_MODEL_TEXT = process.env.GEMINI_MODEL_TEXT || 'gemini-2.5-flash';
+const GEMINI_MODEL_DETECTION = process.env.GEMINI_MODEL_DETECTION || 'gemini-2.5-pro';
 
 let ai = null;
 if (GEMINI_API_KEY) {
   try {
     ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   } catch (err) {
-    console.error('Errore inizializzazione GoogleGenAI:', err);
+    console.error('Errore inizializzazione AI:', err);
   }
 }
 
@@ -26,7 +27,7 @@ function splitBase64(dataUrl) {
 }
 
 router.post('/describe', async (req, res) => {
-  if (!ai) return res.status(500).json({ error: 'Gemini non configurata' });
+  if (!ai) return res.status(500).json({ error: 'AI non configurata' });
   const { businessName, ocrData, photoBase64s } = req.body;
   if (
     typeof businessName !== 'string' ||
@@ -74,7 +75,7 @@ Non includere altro, non fornire testo fuori dal JSON.
 
   try {
     const response = await ai.models.generateContent({
-      model: GEMINI_MODEL_TEXT,
+      model: GEMINI_MODEL_DETECTION,
       contents: [{ parts }],
       config: { temperature: 0.3 }
     });
@@ -101,7 +102,7 @@ Non includere altro, non fornire testo fuori dal JSON.
 
 router.post('/extract', async (req, res) => {
   if (!ai) {
-    return res.status(500).json({ error: 'Gemini API non configurata' });
+    return res.status(500).json({ error: 'AI non configurata' });
   }
   const { imageBase64, businessNameHint } = req.body;
   if (!imageBase64) {
@@ -151,7 +152,7 @@ router.post('/extract', async (req, res) => {
       return res.json({ raw: response.text });
     }
   } catch (err) {
-    console.error('Errore chiamata Gemini:', err);
+    console.error('Errore con l\'AI:', err);
     return res.status(500).json({ error: err.message });
   }
 });

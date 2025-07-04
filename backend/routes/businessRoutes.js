@@ -11,18 +11,18 @@ const { Sequelize } = require('sequelize'); // Import Sequelize
 // POST /api/businesses - Create a new business
 router.post('/', authMiddleware, async (req, res) => {
   try {
-     const { name, address, latitude, longitude, p_iva, photoBase64, type } = req.body;
+    const { name, address, latitude, longitude, p_iva, photoBase64, type } = req.body;
 
     // Validate input
-    if (!name || !address || !latitude || !longitude) {
-      return res.status(400).json({ message: 'Name, address, latitude, and longitude are required.' });
+    if (!name || !address || !latitude || !longitude || !type || !p_iva) {
+      return res.status(400).json({ message: 'Nome, indirizzo, coordinate, tipo attività e p.iva sono richieste.' });
     }
     // Latitude and longitude are sent as strings from FormData, convert and validate
     const lat = parseFloat(latitude);
     const lon = parseFloat(longitude);
 
     if (isNaN(lat) || typeof lat !== 'number' || isNaN(lon) || typeof lon !== 'number') {
-      return res.status(400).json({ message: 'Latitude and longitude must be valid numbers.' });
+      return res.status(400).json({ message: 'Latitudine e longitudinee devono essere dei numeri validi.' });
     }
 
     const photo_base64 = photoBase64 || null;
@@ -40,19 +40,19 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Fetch the business with its association to return the username of the user who added it
     const businessWithUser = await Business.findByPk(newBusiness.id, {
-        include: [{
-            model: User,
-            as: 'addedByUser', // Make sure this alias matches your model definition
-            attributes: ['id', 'username'] // Select only specific user attributes
-        }]
+      include: [{
+        model: User,
+        as: 'addedByUser', // Make sure this alias matches your model definition
+        attributes: ['id', 'username'] // Select only specific user attributes
+      }]
     });
 
     res.status(201).json(businessWithUser);
 
   } catch (error) {
-    console.error('Error creating business:', { message: error.message, name: error.name, stack: error.stack, details: error });
+    console.error('Errore nella creazione dell\'attività:', { message: error.message, name: error.name, stack: error.stack, details: error });
     if (error.name === 'SequelizeValidationError') {
-      return res.status(400).json({ message: 'Validation error', errors: error.errors.map(e => e.message) });
+      return res.status(400).json({ message: 'Errore di validazione', errors: error.errors.map(e => e.message) });
     } else if (error.name && error.name.startsWith('Sequelize')) {
       // Handle other Sequelize-specific errors
       const status = error.name === 'SequelizeUniqueConstraintError' ? 409 : 400;
@@ -61,13 +61,14 @@ router.post('/', authMiddleware, async (req, res) => {
         type: error.name,
         errors: error.errors ? error.errors.map(e => e.message) : []
       });
+    } else if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'Attività già esistente con questi dati.' });
     }
-    res.status(500).json({ message: 'Server error while creating business.' });
+    res.status(500).json({ message: 'Errore interno' });
   }
 });
 
 // GET /api/businesses - Get a list of all businesses
-// GET /api/businesses - Get a list of all businesses (with optional type filter)
 router.get('/', async (req, res) => {
   try {
     // 1) Leggo il filtro dal client: ?type=bar, ?type=ristorante, ecc.
@@ -105,7 +106,7 @@ router.get('/', async (req, res) => {
     res.json(businesses);
   } catch (error) {
     console.error('Error fetching businesses:', error);
-    res.status(500).json({ message: 'Server error while fetching businesses.' });
+    res.status(500).json({ message: 'Errore interno nella ricerca delle attività.' });
   }
 });
 
@@ -136,13 +137,13 @@ router.get('/:id', async (req, res) => {
     });
 
     if (!business) {
-      return res.status(404).json({ message: 'Business not found.' });
+      return res.status(404).json({ message: 'Attività non trovata.' });
     }
 
     res.json(business);
   } catch (error) {
     console.error('Error fetching business details:', error);
-    res.status(500).json({ message: 'Server error while fetching business details.' });
+    res.status(500).json({ message: 'Errore interno nella ricerca dei dettagli dell\'attività.' });
   }
 });
 
@@ -166,8 +167,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
     // Basic validation for provided fields
     if (name !== undefined && !name.trim()) return res.status(400).json({ message: 'Name cannot be empty.' });
     if (address !== undefined && !address.trim()) return res.status(400).json({ message: 'Address cannot be empty.' });
-    if (latitude !== undefined && typeof latitude !== 'number') return res.status(400).json({ message: 'Latitude must be a number.'});
-    if (longitude !== undefined && typeof longitude !== 'number') return res.status(400).json({ message: 'Longitude must be a number.'});
+    if (latitude !== undefined && typeof latitude !== 'number') return res.status(400).json({ message: 'Latitude must be a number.' });
+    if (longitude !== undefined && typeof longitude !== 'number') return res.status(400).json({ message: 'Longitude must be a number.' });
 
 
     // Update only provided fields
@@ -181,11 +182,11 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     // Fetch the updated business with its 'addedByUser' association
     const updatedBusinessWithUser = await Business.findByPk(businessId, {
-        include: [{
-            model: User,
-            as: 'addedByUser',
-            attributes: ['id', 'username']
-        }]
+      include: [{
+        model: User,
+        as: 'addedByUser',
+        attributes: ['id', 'username']
+      }]
     });
 
     res.json(updatedBusinessWithUser);

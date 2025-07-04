@@ -30,7 +30,9 @@ const BusinessMenu: React.FC<BusinessMenuProps> = ({
     .filter(b => filterType === 'all' || b.type === filterType)
     .filter(b => {
       const term = searchTerm.toLowerCase();
-      return b.name.toLowerCase().includes(term) || b.address.toLowerCase().includes(term);
+      return b.name.toLowerCase().includes(term) 
+      || b.address.toLowerCase().includes(term)
+      || b.p_iva.toLowerCase().includes(term);
     });
 
   // Scrolla sull’item selezionato
